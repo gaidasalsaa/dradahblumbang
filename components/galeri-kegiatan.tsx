@@ -55,7 +55,7 @@ export default function GaleriKegiatan() {
           <GalleryCard
             img="/sd-dradah.jpeg"
             title="Sosialisasi Pendidikan Karakter: Anti Bullying"
-            desc="Tim KKN melakukan kegiatan edukasi mengenai anti-bullying di SDN 1 dan SDN 2 Dradahblumbang. Kegiatan ini bertujuan untuk meningkatkan pemahaman siswa tentang pentingnya saling menghargai dan membangun lingkungan sekolah yang aman serta ramah.
+            desc="Tim KKN-BBK Universitas Airlangga melakukan kegiatan edukasi mengenai anti-bullying di SDN 1 dan SDN 2 Dradahblumbang. Kegiatan ini bertujuan untuk meningkatkan pemahaman siswa tentang pentingnya saling menghargai dan membangun lingkungan sekolah yang aman serta ramah.
                   Dalam sesi pemaparan, siswa dikenalkan pada pengertian bullying, bentuk-bentuknya, contoh kasus, serta tindakan baik yang harus dilakukan jika mereka melihat atau mengalami bullying. 
                   Penyampaian dibuat interaktif agar materi mudah dipahami oleh siswa. Setelah penyampaian materi, siswa mengikuti permainan Memory Run untuk melatih kerja sama dan fokus. Kegiatan ditutup dengan post-test guna mengukur pemahaman mereka mengenai anti-bullying. 
                   Harapannya, siswa mampu mengenali perilaku bullying dan memilih tindakan yang tepat untuk mencegahnya."
@@ -65,7 +65,7 @@ export default function GaleriKegiatan() {
           <GalleryCard
             img="/posyandu.jpg"
             title="Posyandu"
-            desc={`Pada 15 Januari 2026, Tim KKN BBK 7 Dradah Blumbang berpartisipasi dalam kegiatan Posyandu di PAUD Al-Ma’ruf dengan membantu penimbangan balita, pencatatan perkembangan, dan administrasi bersama kader setempat. Kegiatan dilanjutkan dengan pemeriksaan kesehatan gratis bagi lansia di Dusun Dradah, meliputi pengecekan tensi dan gula darah, konsultasi kesehatan, serta pemberian obat dan vitamin. Seluruh rangkaian kegiatan terlaksana berkat kerja sama dengan Puskesmas Desa Dradahblumbang.`}
+            desc={`Pada 15 Januari 2026, Tim KKN-BBK 7 Dradah Blumbang Universitas Airlangga berpartisipasi dalam kegiatan Posyandu di PAUD Al-Ma’ruf dengan membantu penimbangan balita, pencatatan perkembangan, dan administrasi bersama kader setempat. Kegiatan dilanjutkan dengan pemeriksaan kesehatan gratis bagi lansia di Dusun Dradah, meliputi pengecekan tensi dan gula darah, konsultasi kesehatan, serta pemberian obat dan vitamin. Seluruh rangkaian kegiatan terlaksana berkat kerja sama dengan Puskesmas Desa Dradahblumbang.`}
             onOpen={setSelected}
           />
         </div>
