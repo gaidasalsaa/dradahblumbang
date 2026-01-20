@@ -55,8 +55,8 @@ export default function GaleriKegiatan() {
           <GalleryCard
             img="/sd-dradah.jpeg"
             title="Sosialisasi Pendidikan Karakter: Anti Bullying"
-            desc="Tim KKN melakukan kegiatan edukasi mengenai anti-bullying di SDN 2 Dradah Blumbang. Kegiatan ini bertujuan untuk meningkatkan pemahaman siswa tentang pentingnya saling menghargai dan membangun lingkungan sekolah yang aman serta ramah.
-                  Dalam sesi pemaparan, siswa dikenalkan pada pengertian bullying, bentuk-bentuknya, contoh kasus, serta tindakan baik yang harus dilakukan iika mereka melihat atau mengalami bullving. 
+            desc="Tim KKN melakukan kegiatan edukasi mengenai anti-bullying di SDN 1 dan SDN 2 Dradahblumbang. Kegiatan ini bertujuan untuk meningkatkan pemahaman siswa tentang pentingnya saling menghargai dan membangun lingkungan sekolah yang aman serta ramah.
+                  Dalam sesi pemaparan, siswa dikenalkan pada pengertian bullying, bentuk-bentuknya, contoh kasus, serta tindakan baik yang harus dilakukan jika mereka melihat atau mengalami bullying. 
                   Penyampaian dibuat interaktif agar materi mudah dipahami oleh siswa. Setelah penyampaian materi, siswa mengikuti permainan Memory Run untuk melatih kerja sama dan fokus. Kegiatan ditutup dengan post-test guna mengukur pemahaman mereka mengenai anti-bullying. 
                   Harapannya, siswa mampu mengenali perilaku bullying dan memilih tindakan yang tepat untuk mencegahnya."
             onOpen={setSelected}
