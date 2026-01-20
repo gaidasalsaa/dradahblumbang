@@ -53,9 +53,12 @@ export default function GaleriKegiatan() {
           />
 
           <GalleryCard
-            img="/kerja-bakti.jpg"
-            title="Kerja Bakti bersama KKN-BBK 7 UNAIR"
-            desc="Kegiatan kerja bakti warga dusun Blumbang bersama mahasiswa KKN BBK 7 Universitas Airlangga"
+            img="/sd-dradah.jpeg"
+            title="Sosialisasi Pendidikan Karakter: Anti Bullying"
+            desc="Tim KKN melakukan kegiatan edukasi mengenai anti-bullying di SDN 2 Dradah Blumbang. Kegiatan ini bertujuan untuk meningkatkan pemahaman siswa tentang pentingnya saling menghargai dan membangun lingkungan sekolah yang aman serta ramah.
+                  Dalam sesi pemaparan, siswa dikenalkan pada pengertian bullying, bentuk-bentuknya, contoh kasus, serta tindakan baik yang harus dilakukan iika mereka melihat atau mengalami bullving. 
+                  Penyampaian dibuat interaktif agar materi mudah dipahami oleh siswa. Setelah penyampaian materi, siswa mengikuti permainan Memory Run untuk melatih kerja sama dan fokus. Kegiatan ditutup dengan post-test guna mengukur pemahaman mereka mengenai anti-bullying. 
+                  Harapannya, siswa mampu mengenali perilaku bullying dan memilih tindakan yang tepat untuk mencegahnya."
             onOpen={setSelected}
           />
 

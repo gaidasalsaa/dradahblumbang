@@ -5,8 +5,8 @@ import GeografisSection from "@/components/geografis";
 import StrukturDesa from "@/components/struktur-desa";
 // import StrukturOrganisasi from "@/components/struktur-organisasi";
 import DataWilayah from "@/components/data-wilayah";
-import GaleriKegiatan from "@/components/galeri-kegiatan";
 import Administrasi from "@/components/administrasi";
+import GaleriKegiatan from "@/components/galeri-kegiatan";
 import KontakDesa from "@/components/kontak-desa";
 import Footer from "@/components/footer";
 
@@ -22,8 +22,8 @@ export default function HomePage() {
       <StrukturDesa />
       {/* <StrukturOrganisasi /> */}
       <DataWilayah />
-      <GaleriKegiatan />
       <Administrasi />
+      <GaleriKegiatan />
       <KontakDesa />
       <Footer />
     </main>
