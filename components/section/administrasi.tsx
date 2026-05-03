@@ -1,4 +1,27 @@
+"use client";
+
+import Link from "next/link";
+
 export default function Administrasi() {
+  const layanan = [
+    {
+      title: "Surat Keterangan Tidak Mampu (SKTM)",
+      href: "/administrasi/sktm",
+    },
+    {
+      title: "Surat Keterangan Domisili",
+      href: "/administrasi/domisili",
+    },
+    {
+      title: "Surat Keterangan Usaha (SKU)",
+      href: "/administrasi/sku",
+    },
+    {
+      title: "Surat Pengantar SKCK",
+      href: "/administrasi/skck",
+    },
+  ];
+
   return (
     <section id="administrasi" className="w-full py-24 bg-[#FFF9EB]">
       <div className="max-w-5xl mx-auto px-4">
@@ -22,15 +45,8 @@ export default function Administrasi() {
         {/* ============== CARD GRID ================= */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-4">
 
-          {[
-            "Surat Keterangan Tidak Mampu (SKTM)",
-            "Surat Keterangan Domisili",
-            "Surat Keterangan Usaha (SKU)",
-            "Surat Pengantar SKCK",
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="
+          {layanan.map((item, i) => (
+            <Link key={i} className="
                 bg-white
                 rounded-2xl
                 shadow-md
@@ -41,10 +57,11 @@ export default function Administrasi() {
                 flex-col
                 items-center
                 text-center
-                hover:shadow-lg
+                cursor-pointer
+                hover:shadow-xl
                 transition
-              "
-            >
+              " href={item.href}>
+            
               <div className="w-8 h-8 rounded-full bg-[#FFA726]/20 flex items-center justify-center mb-3">
                 <span className="text-[#FB8C00] font-bold text-lg">
                   {i + 1}
@@ -52,13 +69,13 @@ export default function Administrasi() {
               </div>
 
               <p className="text-sm font-medium text-gray-700 leading-relaxed">
-                {item}
+                {item.title}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
 
-        {/* CTA button */}
+        {/* CTA button
         <div className="flex justify-center mt-10">
           <a
             href="https://forms.gle/45Krbz6FYC9Y3MGS6"
@@ -78,7 +95,7 @@ export default function Administrasi() {
           >
             Klik di sini untuk mengajukan permohonan
           </a>
-        </div>
+        </div> */}
 
       </div>
     </section>
