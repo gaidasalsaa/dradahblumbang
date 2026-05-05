@@ -6,8 +6,8 @@ import MaintenancePage from "@/components/maintenance";
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
-      {/* <Beranda /> */}
-      <MaintenancePage />
+      <Beranda />
+      {/* <MaintenancePage /> */}
     </main>
   );
 }
