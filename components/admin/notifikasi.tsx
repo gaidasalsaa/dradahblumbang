@@ -10,7 +10,7 @@ function ToastItem({ toast, onRemove }: { toast: ToastState; onRemove: (id: stri
       className={`flex items-center gap-3 bg-white border rounded-xl px-4 py-3.5 shadow-xl max-w-[320px]
         ${isSuccess ? 'border-l-4 border-l-[#33691E]' : 'border-l-4 border-l-[#C62828]'}
         border-[#E5E7EB]`}
-      style={{ animation: 'slideIn 0.25s ease', fontFamily: 'Poppins, sans-serif' }}
+      style={{ animation: 'slideIn 0.25s ease' }}
     >
       <span className="text-lg shrink-0">{isSuccess ? '✅' : '📨'}</span>
       <p className="text-[13.5px] font-medium text-[#1A2E1A] leading-snug flex-1">{toast.message}</p>

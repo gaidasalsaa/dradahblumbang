@@ -42,14 +42,14 @@ export default function AdminModalSetuju({ item, onConfirm, onClose }: Props) {
           <div className="w-9 h-9 rounded-[9px] bg-[#C5E1A5] flex items-center justify-center text-[#33691E]">
             <CheckCircleIcon />
           </div>
-          <h2 className="text-[15px] font-bold text-[#1A2E1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-[15px] font-bold text-[#1A2E1A]">
             Konfirmasi Persetujuan
           </h2>
         </div>
 
         {/* Body */}
         <div className="px-5 py-5">
-          <p className="text-[13px] text-[#6B7280] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="text-[13px] text-[#6B7280] mb-4">
             Pengajuan atas nama:{' '}
             <strong className="text-[#33691E] font-semibold">{item.nama}</strong>
           </p>
@@ -57,12 +57,12 @@ export default function AdminModalSetuju({ item, onConfirm, onClose }: Props) {
           {/* Warning Box */}
           <div className="flex gap-2.5 bg-[#FFF8E1] border border-[#FFE082] rounded-xl p-3.5 mb-4">
             <span className="text-base mt-0.5 shrink-0">⚠️</span>
-            <p className="text-[12.5px] text-[#BF360C] leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <p className="text-[12.5px] text-[#BF360C] leading-relaxed">
               Jika Anda menyetujui formulir ini, warga dapat mengambil dokumen di balai desa.
             </p>
           </div>
 
-          <p className="text-[13px] text-[#6B7280] leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="text-[13px] text-[#6B7280] leading-relaxed">
             Pastikan data yang diajukan sudah sesuai dan dokumen dapat diproses lebih lanjut.
           </p>
         </div>
@@ -72,14 +72,12 @@ export default function AdminModalSetuju({ item, onConfirm, onClose }: Props) {
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-[9px] border border-[#E5E7EB] text-[#6B7280] text-[13px] font-medium hover:bg-[#F7F8FA] transition-colors"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Batal
           </button>
           <button
             onClick={onConfirm}
             className="flex items-center gap-1.5 px-5 py-2 rounded-[9px] bg-[#33691E] text-white text-[13px] font-semibold hover:opacity-85 transition-opacity"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" />

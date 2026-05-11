@@ -9,16 +9,28 @@ export interface Pengajuan {
   tab: LayananTab
   no: string
   nama: string
-  rt: string
+  nik: string
   tgl: string
   status: StatusType
+  file_url?: string
   rejectNotes?: string
+}
+
+export interface PengajuanRow {
+  id: string
+  nama_warga: string
+  nik: string
+  jenis_surat: string
+  tanggal_pengajuan: string
+  status: StatusType
+  catatan_revisi: string | null
+  file_url: string | null
 }
 
 export interface Notifikasi {
   id: string
   nama: string
-  layanan: string
+  jenis: LayananTab
   waktu: string
   dibaca: boolean
 }
@@ -43,22 +55,22 @@ export const LAYANAN_TABS_SHORT = [
 
 export const MOCK_PENGAJUAN: Pengajuan[] = [
   // Tab 0 — Tidak Mampu
-  { id: 'p001', tab: 0, no: '001', nama: 'Budi Santoso',  rt: 'RT 04 / RW 02', tgl: '01 Mei 2026', status: 'Menunggu' },
-  { id: 'p002', tab: 0, no: '002', nama: 'Dewi Kartika',  rt: 'RT 05 / RW 02', tgl: '30 Apr 2026', status: 'Ditolak',  rejectNotes: 'Foto KTP kurang jelas.' },
-  { id: 'p003', tab: 0, no: '003', nama: 'Hendra Jaya',   rt: 'RT 02 / RW 01', tgl: '28 Apr 2026', status: 'Disetujui' },
+  { id: 'p001', tab: 0, no: '001', nama: 'Budi Santoso',  nik: '19999999999', tgl: '01 Mei 2026', status: 'Menunggu' },
+  { id: 'p002', tab: 0, no: '002', nama: 'Dewi Kartika',  nik: '19999999', tgl: '30 Apr 2026', status: 'Ditolak',  rejectNotes: 'Foto KTP kurang jelas.' },
+  { id: 'p003', tab: 0, no: '003', nama: 'Hendra Jaya',   nik: '19999999998', tgl: '28 Apr 2026', status: 'Disetujui' },
   // Tab 1 — Domisili
-  { id: 'p004', tab: 1, no: '004', nama: 'Siti Aminah',   rt: 'RT 02 / RW 01', tgl: '01 Mei 2026', status: 'Menunggu' },
-  { id: 'p005', tab: 1, no: '005', nama: 'Roni Prasetyo', rt: 'RT 01 / RW 03', tgl: '29 Apr 2026', status: 'Disetujui' },
+  { id: 'p004', tab: 1, no: '004', nama: 'Siti Aminah',   nik: '19999999997', tgl: '01 Mei 2026', status: 'Menunggu' },
+  { id: 'p005', tab: 1, no: '005', nama: 'Roni Prasetyo', nik: '19999999996', tgl: '29 Apr 2026', status: 'Disetujui' },
   // Tab 2 — Usaha
-  { id: 'p006', tab: 2, no: '006', nama: 'Eko Budiarto',  rt: 'RT 03 / RW 01', tgl: '01 Mei 2026', status: 'Menunggu' },
-  { id: 'p007', tab: 2, no: '007', nama: 'Sri Wahyuni',   rt: 'RT 06 / RW 03', tgl: '27 Apr 2026', status: 'Disetujui' },
+  { id: 'p006', tab: 2, no: '006', nama: 'Eko Budiarto',  nik: '19999999995', tgl: '01 Mei 2026', status: 'Menunggu' },
+  { id: 'p007', tab: 2, no: '007', nama: 'Sri Wahyuni',   nik: '19999999994', tgl: '27 Apr 2026', status: 'Disetujui' },
   // Tab 3 — SKCK
-  { id: 'p008', tab: 3, no: '008', nama: 'Rina Wijaya',   rt: 'RT 01 / RW 03', tgl: '01 Mei 2026', status: 'Menunggu' },
+  { id: 'p008', tab: 3, no: '008', nama: 'Rina Wijaya',   nik: '19999999993', tgl: '01 Mei 2026', status: 'Menunggu' },
 ]
 
 export const MOCK_NOTIFIKASI: Notifikasi[] = [
-  { id: 'n1', nama: 'Siti Aminah',   layanan: 'Surat Keterangan Domisili',    waktu: '5 menit lalu',  dibaca: false },
-  { id: 'n2', nama: 'Budi Santoso',  layanan: 'Surat Keterangan Tidak Mampu', waktu: '23 menit lalu', dibaca: false },
-  { id: 'n3', nama: 'Rina Wijaya',   layanan: 'Surat Pengantar SKCK',          waktu: '1 jam lalu',    dibaca: false },
-  { id: 'n4', nama: 'Ahmad Fauzi',   layanan: 'Surat Keterangan Usaha — sudah diproses', waktu: 'Kemarin', dibaca: true },
+  { id: 'n1', nama: 'Siti Aminah',  jenis: 1, waktu: '5 menit lalu',  dibaca: false },
+  { id: 'n2', nama: 'Budi Santoso', jenis: 0, waktu: '23 menit lalu', dibaca: false },
+  { id: 'n3', nama: 'Rina Wijaya',  jenis: 3, waktu: '1 jam lalu',    dibaca: false },
+  { id: 'n4', nama: 'Ahmad Fauzi',  jenis: 2, waktu: 'Kemarin',       dibaca: true  },
 ]
