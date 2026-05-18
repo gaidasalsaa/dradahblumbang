@@ -47,7 +47,7 @@ function formatTgl(iso: string) {
 function mapRow(row: PengajuanRow, no: number): Pengajuan {
   return {
     id: row.id,
-    no,
+    no: String(no),
     nama: row.nama_warga,
     nik: row.nik,
     tgl: formatTgl(row.tanggal_pengajuan),
