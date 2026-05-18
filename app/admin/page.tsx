@@ -3,8 +3,8 @@
 import { useState, useCallback } from 'react'
 import { LayananTab, Pengajuan } from '../../lib/adminTypes'
 import { useAdmin } from '../../lib/adminContext'
-import AdminStatCards from '../../components/admin/statcard'
-import AdminTabs from '../../components/admin/statistik'
+import AdminStatCards from '../../components/admin/statistik'
+import AdminTabs from '../../components/admin/tabel-tabs'
 import AdminTable from '../../components/admin/tabel'
 import AdminModalSetuju from '../../components/admin/modal-setuju'
 import AdminModalTolak from '../../components/admin/modal-tolak'
@@ -45,42 +45,40 @@ export default function AdminDashboardPage() {
   }, [modalTolakItem, updateStatus, addToast])
 
   return (
-    <main className="max-w-[1020px] mx-auto px-6 py-7 pb-12">
+    <main className="w-full px-7 py-8 pb-16 min-h-screen">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1
-          className="text-[22px] font-bold text-[#33691E] leading-tight"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
+      <div className="mb-8">
+        <h1 className="text-[26px] font-bold text-[#33691E] leading-tight">
           Dashboard Admin
         </h1>
-        <p
-          className="text-[13px] text-[#6B7280] mt-1 font-normal"
-          style={{ fontFamily: 'Poppins, sans-serif' }}
-        >
-          Kelola pengajuan layanan surat warga Desa Dradah Blumbang
+        <p className="text-[14px] text-[#6B7280] mt-2 font-normal">
+          Kelola pengajuan layanan surat warga Desa Dradahblumbang
         </p>
       </div>
 
       {/* Stat Cards */}
-      <AdminStatCards />
+      <div className="mb-7">
+        <AdminStatCards />
+      </div>
 
       {/* Tabs + Filter + Table */}
-      <AdminTabs
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        search={search}
-        onSearchChange={setSearch}
-        filterStatus={filterStatus}
-        onFilterChange={setFilterStatus}
-      />
-      <AdminTable
-        activeTab={activeTab}
-        search={search}
-        filterStatus={filterStatus}
-        onSetuju={setModalSetujuItem}
-        onTolak={setModalTolakItem}
-      />
+      <div>
+        <AdminTabs
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          search={search}
+          onSearchChange={setSearch}
+          filterStatus={filterStatus}
+          onFilterChange={setFilterStatus}
+        />
+        <AdminTable
+          activeTab={activeTab}
+          search={search}
+          filterStatus={filterStatus}
+          onSetuju={setModalSetujuItem}
+          onTolak={setModalTolakItem}
+        />
+      </div>
 
       {/* Modals */}
       <AdminModalSetuju

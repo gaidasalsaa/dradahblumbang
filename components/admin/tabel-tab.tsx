@@ -49,7 +49,7 @@ function StatusBadge({ status }: { status: StatusType }) {
   const cfg = statusConfig[status]
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${cfg.classes}`}
+      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${cfg.classes}`}
     >
       {cfg.dot} {cfg.label}
     </span>
@@ -66,30 +66,32 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
   return (
     <tr className="hover:bg-[#FAFDF7] transition-colors">
       {/* ID Pengajuan */}
-      <td className="px-3.5 py-3 text-[11px] text-[#6B7280] font-mono whitespace-nowrap" style={{ fontFamily: 'monospace' }}>
+      <td className="px-3.5 py-3 text-sm text-[#9CA3AF] font-mono whitespace-nowrap" style={{ fontFamily: 'monospace' }}>
         {item.id}
       </td>
 
       {/* Nama */}
-      <td className="px-3.5 py-3">
-        <p className="text-[13px] font-semibold text-[#1A2E1A]">
-          {item.nama}
-        </p>
-        <p className="text-[11px] text-[#6B7280] mt-0.5">
-          NIK: {item.nik}
-        </p>
+      <td className="px-3.5 py-4 align-middle">
+        <div className="flex flex-col items-center">
+          <p className="text-sm font-semibold text-[#1A2E1A]">
+            {item.nama}
+          </p>
+          <p className="text-[13px] text-[#6B7280] mt-0.5">
+            NIK: {item.nik}
+          </p>
+        </div>
       </td>
 
       {/* Tanggal */}
-      <td className="px-3.5 py-3 text-[12px] text-[#6B7280] whitespace-nowrap">
+      <td className="px-3.5 py-4 text-[13px] text-[#6B7280] whitespace-nowrap text-center align-middle">
         {item.tgl}
       </td>
 
       {/* Download PDF */}
-      <td className="px-3.5 py-3">
+      <td className="px-3.5 py-4 text-center align-middle">
         <button
           onClick={() => alert(`Membuka PDF pengajuan ${item.nama}...`)}
-          className="flex items-center justify-center gap-1.5 w-full border border-[#33691E] text-[#33691E] rounded-lg px-3 py-1.5 text-[11.5px] font-semibold hover:bg-[#F1F8E9] transition-colors whitespace-nowrap"
+          className="flex items-center justify-center gap-1.5 w-full border border-[#33691E] text-[#33691E] rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-[#F1F8E9] transition-colors whitespace-nowrap"
         >
           <DownloadIcon />
           Download PDF
@@ -97,23 +99,23 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
       </td>
 
       {/* Status */}
-      <td className="px-3.5 py-3">
+      <td className="px-3.5 py-4 text-center align-middle">
         <StatusBadge status={item.status} />
       </td>
 
       {/* Aksi */}
-      <td className="px-3.5 py-3">
+      <td className="px-3.5 py-4 text-center align-middle">
         {item.status === 'Menunggu' && (
           <div className="flex gap-1.5">
             <button
               onClick={() => onSetuju(item)}
-              className="flex-1 flex items-center justify-center gap-1 bg-[#33691E] text-white rounded-lg py-1.5 text-[11px] font-semibold hover:opacity-85 transition-opacity whitespace-nowrap"
+              className="flex-1 flex items-center justify-center gap-1 bg-[#33691E] text-white rounded-lg py-1.5 text-xs font-semibold hover:opacity-85 transition-opacity whitespace-nowrap"
             >
               <CheckIcon /> Setujui
             </button>
             <button
               onClick={() => onTolak(item)}
-              className="flex-1 flex items-center justify-center gap-1 bg-[#FFEBEE] text-[#C62828] border border-[#EF9A9A] rounded-lg py-1.5 text-[11px] font-semibold hover:bg-[#FFCDD2] transition-colors whitespace-nowrap"
+              className="flex-1 flex items-center justify-center gap-1 bg-[#FFEBEE] text-[#C62828] border border-[#EF9A9A] rounded-lg py-1.5 text-xs font-semibold hover:bg-[#FFCDD2] transition-colors whitespace-nowrap"
             >
               <XIcon /> Tolak
             </button>
@@ -122,7 +124,7 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
         {item.status === 'Ditolak' && (
           <button
             onClick={() => onTolak(item)}
-            className="w-full flex items-center justify-center gap-1.5 bg-[#E8EAF6] text-[#283593] border border-[#C5CAE9] rounded-lg py-1.5 text-[11px] font-semibold hover:bg-[#C5CAE9] transition-colors"
+            className="w-full flex items-center justify-center gap-1.5 bg-[#E8EAF6] text-[#283593] border border-[#C5CAE9] rounded-lg py-1.5 text-xs font-semibold hover:bg-[#C5CAE9] transition-colors"
           >
             <EditIcon /> Kirim Revisi
           </button>
@@ -169,7 +171,7 @@ export default function AdminTable({ activeTab, search, filterStatus, onSetuju, 
             {['ID Pengajuan', 'Nama Warga', 'Tanggal Pengajuan', 'Download PDF', 'Status', 'Aksi'].map(h => (
               <th
                 key={h}
-                className="px-3.5 py-2.5 text-left text-[#33691E] font-semibold text-[12px] whitespace-nowrap"
+                className="px-3.5 py-2.5 text-center text-[#33691E] font-semibold text-[13px] whitespace-nowrap"
               >
                 {h}
               </th>
@@ -196,4 +198,3 @@ export default function AdminTable({ activeTab, search, filterStatus, onSetuju, 
     </div>
   )
 }
-

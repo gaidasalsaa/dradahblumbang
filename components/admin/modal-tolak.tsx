@@ -50,25 +50,24 @@ export default function AdminModalTolak({ item, onSend, onClose }: Props) {
           <div className="w-9 h-9 rounded-[9px] bg-[#EF9A9A] flex items-center justify-center text-[18px]">
             📝
           </div>
-          <h2 className="text-[15px] font-bold text-[#1A2E1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-[15px] font-bold text-[#1A2E1A]">
             Tolak &amp; Kirim Catatan Revisi
           </h2>
         </div>
 
         {/* Body */}
         <div className="px-5 py-5">
-          <p className="text-[13px] text-[#6B7280] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="text-[13px] text-[#6B7280] mb-4">
             Pengajuan atas nama:{' '}
             <strong className="text-[#33691E] font-semibold">{item.nama}</strong>
           </p>
 
-          <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="text-[13px] text-[#6B7280] leading-relaxed mb-4">
             Tuliskan catatan revisi yang perlu dilengkapi warga. Catatan ini akan dikirim ke halaman warga.
           </p>
 
           <label
             className="block text-[12.5px] font-semibold text-[#1A2E1A] mb-2"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Catatan Revisi untuk Warga
           </label>
@@ -82,10 +81,9 @@ export default function AdminModalTolak({ item, onSend, onClose }: Props) {
                 ? 'border-[#C62828] focus:border-[#C62828]'
                 : 'border-[#E5E7EB] focus:border-[#558B2F]'
               }`}
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           />
           {error && (
-            <p className="text-[11.5px] text-[#C62828] mt-1.5" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <p className="text-[11.5px] text-[#C62828] mt-1.5">
               ⚠ Catatan revisi wajib diisi sebelum mengirim.
             </p>
           )}
@@ -96,14 +94,12 @@ export default function AdminModalTolak({ item, onSend, onClose }: Props) {
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-[9px] border border-[#E5E7EB] text-[#6B7280] text-[13px] font-medium hover:bg-[#F7F8FA] transition-colors"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             Batal
           </button>
           <button
             onClick={handleSend}
             className="flex items-center gap-1.5 px-5 py-2 rounded-[9px] bg-[#C62828] text-white text-[13px] font-semibold hover:opacity-85 transition-opacity"
-            style={{ fontFamily: 'Poppins, sans-serif' }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />

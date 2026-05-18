@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 type AnggotaKeluarga = {
   nama: string;
@@ -98,11 +99,37 @@ export default function FormDomisili() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem("domisiliData", JSON.stringify(form));
-    router.push("/administrasi/sukses");
-  };
+  // KE
+const [loading, setLoading] = useState(false);
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!isFormValid) {
+    alert("Mohon lengkapi seluruh data terlebih dahulu.");
+    return;
+  }
+
+  setLoading(true);
+  const { error } = await supabase.from("pengajuan_surat").insert({
+    nama_warga: form.nama,
+    nik: form.nik,
+    jenis_surat: "domisili",
+    status: "Menunggu",
+    // simpan detail tambahan sebagai catatan (opsional)
+    catatan_revisi: null,
+    file_url: null,
+  });
+
+  setLoading(false);
+
+  if (error) {
+    alert("Gagal mengirim pengajuan. Coba lagi.");
+    console.error(error);
+    return;
+  }
+
+  router.push("/administrasi/sukses");
+};
 
   const inputClass =
     "w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400";
@@ -558,24 +585,15 @@ export default function FormDomisili() {
             >
               Reset Form
             </button>
-
             <button
-            type="submit"
-            onClick={(e) => {
-              if (!isFormValid) {
-                e.preventDefault();
-                alert("Mohon lengkapi seluruh data terlebih dahulu.");
-                return;
-              }
-
-              router.push("/administrasi/sukses");
-            }}
-            className={`flex-1 rounded-md px-4 py-2.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm ${
-              isFormValid
-                ? "bg-amber-400 hover:bg-amber-500 text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
+              type="submit"
+              disabled={!isFormValid || loading}
+              className={`flex-1 rounded-md px-4 py-2.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm ${
+                isFormValid && !loading
+                  ? "bg-amber-400 hover:bg-amber-500 text-white"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -585,7 +603,7 @@ export default function FormDomisili() {
               <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
             </svg>
 
-            Kirim Pengajuan
+            {loading ? "Mengirim..." : "Kirim Pengajuan"}
           </button>
           </div>
         </form>

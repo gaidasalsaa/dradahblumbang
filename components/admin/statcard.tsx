@@ -17,10 +17,10 @@ function StatCard({ icon, num, label, numColor, bgColor }: StatCardProps) {
         {icon}
       </div>
       <div>
-        <p className={`text-[26px] font-bold leading-none ${numColor}`} style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className={`text-3xl font-bold leading-none ${numColor}`}>
           {num}
         </p>
-        <p className="text-[11.5px] text-[#6B7280] mt-1 font-normal" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-xs text-[#6B7280] mt-1 font-normal">
           {label}
         </p>
       </div>
@@ -42,29 +42,29 @@ export default function AdminStatCards() {
         icon="⏳"
         num={menunggu}
         label="Menunggu Review"
-        numColor="text-[#E65100]"
-        bgColor="bg-[#FFF8E1]"
+        numColor="text-[#F57F17]"
+        bgColor="bg-[#FFFDE7]"
       />
       <StatCard
         icon="✅"
         num={disetujui}
         label="Disetujui"
-        numColor="text-[#33691E]"
-        bgColor="bg-[#F1F8E9]"
+        numColor="text-[#2E7D32]"
+        bgColor="bg-[#E8F5E9]"
       />
       <StatCard
         icon="❌"
         num={ditolak}
         label="Ditolak / Revisi"
-        numColor="text-[#C62828]"
-        bgColor="bg-[#FFEBEE]"
+        numColor="text-[#F9A825]"
+        bgColor="bg-[#FFF9C4]"
       />
       <StatCard
         icon="📋"
         num={total}
         label="Total Pengajuan"
-        numColor="text-[#5E35B1]"
-        bgColor="bg-[#EDE7F6]"
+        numColor="text-[#1B5E20]"
+        bgColor="bg-[#C8E6C9]"
       />
     </div>
   )

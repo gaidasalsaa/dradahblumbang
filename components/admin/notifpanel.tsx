@@ -17,13 +17,13 @@ function NotifItem({ item, onMark }: { item: Notifikasi; onMark: (id: string) =>
         className={`mt-[5px] w-2 h-2 rounded-full shrink-0 ${item.dibaca ? 'bg-[#D1D5DB]' : 'bg-[#FFA726]'}`}
       />
       <div>
-        <p className="text-[13px] font-semibold text-[#1A2E1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-[13px] font-semibold text-[#1A2E1A]">
           {item.nama}
         </p>
-        <p className="text-[11.5px] text-[#6B7280] mt-0.5" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          {item.layanan}
+        <p className="text-[11.5px] text-[#6B7280] mt-0.5">
+          {['Surat Tdk Mampu', 'Surat Domisili', 'Surat Usaha', 'Surat SKCK'][item.jenis]}
         </p>
-        <p className="text-[11px] text-[#9CA3AF] mt-0.5" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-[11px] text-[#9CA3AF] mt-0.5">
           {item.waktu}
         </p>
       </div>
@@ -38,11 +38,11 @@ export default function AdminNotifPanel({ onClose }: Props) {
     <div className="w-[310px] bg-white border border-[#E5E7EB] rounded-xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#F1F8E9] border-b border-[#C5E1A5]">
-        <span className="text-[13px] font-semibold text-[#33691E]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <span className="text-[13px] font-semibold text-[#33691E]">
           Pengajuan Masuk
         </span>
         {unreadCount > 0 && (
-          <span className="text-[10px] font-bold bg-[#FFA726] text-[#33691E] px-2 py-0.5 rounded-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <span className="text-[10px] font-bold bg-[#FFA726] text-[#33691E] px-2 py-0.5 rounded-full">
             {unreadCount} baru
           </span>
         )}
