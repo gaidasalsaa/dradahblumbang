@@ -3,12 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  X,
-  ChevronDown,
-  LogIn,
-} from "lucide-react";
+import { Menu, X, ChevronDown, LogIn } from "lucide-react";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -38,7 +33,6 @@ export default function Navbar() {
     >
       <div>
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          
           {/* Logo + Title */}
           <div className="flex items-center gap-3">
             <Image
@@ -78,44 +72,44 @@ export default function Navbar() {
             </a>
 
             {/* Dropdown Tentang */}
-          <div className="relative group">
-            <button className="flex items-center gap-1 hover:text-[#FFA726] transition">
-              Tentang
-              <ChevronDown size={16} />
-            </button>
+            <div className="relative group">
+              <button className="flex items-center gap-1 hover:text-[#FFA726] transition">
+                Tentang
+                <ChevronDown size={16} />
+              </button>
 
-            <div className="absolute top-full left-0 pt-2 hidden group-hover:block">
-              <div className="w-64 bg-white rounded-xl shadow-lg py-3 text-[#333333]">
-                <a
-                  href="#profil"
-                  className="block px-4 py-2 hover:bg-[#FFF3E0]"
-                >
-                  Profil Desa
-                </a>
+              <div className="absolute top-full left-0 pt-2 hidden group-hover:block">
+                <div className="w-64 bg-white rounded-xl shadow-lg py-3 text-[#333333]">
+                  <a
+                    href="#profil"
+                    className="block px-4 py-2 hover:bg-[#FFF3E0]"
+                  >
+                    Profil Desa
+                  </a>
 
-                <a
-                  href="#struktur"
-                  className="block px-4 py-2 hover:bg-[#FFF3E0]"
-                >
-                  Struktur Desa
-                </a>
+                  <a
+                    href="#struktur"
+                    className="block px-4 py-2 hover:bg-[#FFF3E0]"
+                  >
+                    Struktur Desa
+                  </a>
 
-                <a
-                  href="#data"
-                  className="block px-4 py-2 hover:bg-[#FFF3E0]"
-                >
-                  Data Wilayah & Kependudukan
-                </a>
+                  <a
+                    href="#data"
+                    className="block px-4 py-2 hover:bg-[#FFF3E0]"
+                  >
+                    Data Wilayah & Kependudukan
+                  </a>
 
-                <a
-                  href="#galeri"
-                  className="block px-4 py-2 hover:bg-[#FFF3E0]"
-                >
-                  Galeri Kegiatan
-                </a>
+                  <a
+                    href="#galeri"
+                    className="block px-4 py-2 hover:bg-[#FFF3E0]"
+                  >
+                    Galeri Kegiatan
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
 
             {/* Dropdown Pengajuan Surat */}
             <div className="relative group">
@@ -160,7 +154,7 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden md:block">
-            <a href="/login">
+            <a href="/auth/login">
               <Button className="bg-[#FFA726] hover:bg-[#fb8c00] text-white font-semibold rounded-full flex items-center gap-2">
                 <LogIn size={18} />
                 Login Admin
@@ -183,7 +177,6 @@ export default function Navbar() {
         {open && (
           <div className="md:hidden bg-black/80 backdrop-blur-md border-t border-white/10">
             <nav className="flex flex-col px-6 py-4 text-white font-medium space-y-3">
-              
               <a
                 onClick={() => setOpen(false)}
                 href="#beranda"
@@ -286,7 +279,7 @@ export default function Navbar() {
                 )}
               </div>
 
-              <a href="/login">
+              <a href="/auth/login">
                 <Button className="mt-3 bg-[#FFA726] hover:bg-[#fb8c00] text-white font-semibold rounded-full w-full flex items-center justify-center gap-2">
                   <LogIn size={18} />
                   Login Admin
