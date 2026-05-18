@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { AdminProvider } from '../../lib/adminContext'
-import AdminTopbar from '../../components/admin/navbaradmin'
-import AdminToast from '../../components/admin/notifikasi'
+import AdminTopbar from '../../components/admin/navbar'
+import AdminToast from '../../components/admin/toast'
 
 export const metadata = {
   title: 'Dashboard Admin — Desa Dradah Blumbang',
@@ -13,7 +13,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <AdminProvider>
       <div className="min-h-screen bg-[#F7F8FA]">
         <AdminTopbar />
-        {children}
+          {children}
         <AdminToast />
       </div>
     </AdminProvider>

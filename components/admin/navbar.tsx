@@ -53,14 +53,14 @@ export default function AdminTopbar() {
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-7 h-[72px] bg-[#33691E] border-b-[3px] border-[#FFA726] shadow-lg">
       {/* Logo */}
       <div className="flex items-center gap-3 min-w-0">
-        <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/25 shrink-0">
+        <div className="w-10 h-10 shrink-0">
           <Image src="/logo-dradah.png" alt="Logo Desa Dradahblumbang" width={48} height={48} className="object-contain" />
         </div>
         <div className="min-w-0">
-          <p className="text-white font-bold text-lg leading-tight tracking-wide truncate">
-            Desa Dradahblumbang
+          <p className="text-white font-bold text-sm md:text-base leading-tight tracking-wider uppercase truncate">
+            DESA DRADAHBLUMBANG
           </p>
-          <p className="text-white/55 text-[13px] font-normal hidden sm:block">
+          <p className="text-white/80 text-xs font-normal hidden sm:block">
             Kedungpring, Lamongan
           </p>
         </div>

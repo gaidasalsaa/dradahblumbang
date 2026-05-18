@@ -3,11 +3,9 @@
 import { useState, useCallback } from 'react'
 import { LayananTab, Pengajuan } from '../../lib/adminTypes'
 import { useAdmin } from '../../lib/adminContext'
-import AdminStatCards from '../../components/admin/statistik'
-import AdminTabs from '../../components/admin/tabel-tabs'
-import AdminTable from '../../components/admin/tabel'
-import AdminModalSetuju from '../../components/admin/modal-setuju'
-import AdminModalTolak from '../../components/admin/modal-tolak'
+import AdminStatCards from '../../components/admin/statcard'
+import AdminTableSection from '../../components/admin/table-section'
+import ModalKonfirmasi from '../../components/admin/modal-konfirmasi'
 
 export default function AdminDashboardPage() {
   const { updateStatus, addToast } = useAdmin()
@@ -45,7 +43,7 @@ export default function AdminDashboardPage() {
   }, [modalTolakItem, updateStatus, addToast])
 
   return (
-    <main className="w-full px-7 py-8 pb-16 min-h-screen">
+    <main className="w-full px-6 py-7 pb-16 min-h-screen">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-[26px] font-bold text-[#33691E] leading-tight">
@@ -61,34 +59,29 @@ export default function AdminDashboardPage() {
         <AdminStatCards />
       </div>
 
-      {/* Tabs + Filter + Table */}
-      <div>
-        <AdminTabs
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-          search={search}
-          onSearchChange={setSearch}
-          filterStatus={filterStatus}
-          onFilterChange={setFilterStatus}
-        />
-        <AdminTable
-          activeTab={activeTab}
-          search={search}
-          filterStatus={filterStatus}
-          onSetuju={setModalSetujuItem}
-          onTolak={setModalTolakItem}
-        />
-      </div>
+      {/* Tabs + Filter + Table — sekarang 1 komponen */}
+      <AdminTableSection                      // ← ganti 2 komponen jadi 1
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        search={search}
+        onSearchChange={setSearch}
+        filterStatus={filterStatus}
+        onFilterChange={setFilterStatus}
+        onSetuju={setModalSetujuItem}
+        onTolak={setModalTolakItem}
+      />
 
       {/* Modals */}
-      <AdminModalSetuju
+      <ModalKonfirmasi
+        type="setuju"
         item={modalSetujuItem}
         onConfirm={handleConfirmSetuju}
         onClose={() => setModalSetujuItem(null)}
       />
-      <AdminModalTolak
+      <ModalKonfirmasi
+        type="tolak"
         item={modalTolakItem}
-        onSend={handleSendTolak}
+        onConfirm={(notes) => handleSendTolak(notes!)}
         onClose={() => setModalTolakItem(null)}
       />
     </main>
