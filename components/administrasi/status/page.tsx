@@ -3,6 +3,13 @@
 import { useState } from "react";
 import { MapPinIcon , ClockIcon } from "@heroicons/react/24/solid";
 import { MOCK_PENGAJUAN, LAYANAN_TABS_SHORT } from "@/lib/adminTypes";
+import { supabase } from "@/lib/supabase";
+import { getSKTMData } from "@/lib/pdf/getSKTMData";
+import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
+
+import { getSKUData } from "@/lib/pdf/getSKUData";
+import { generateSKUPDF } from "@/lib/pdf/generateSKU";
+
 
 export default function StatusPage() {
   const [nomor, setNomor] = useState("");
@@ -22,49 +29,51 @@ export default function StatusPage() {
   const normalizeNomor = (value: string) =>
     value.trim().toUpperCase().replace(/\s+/g, "");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const submitted = normalizeNomor(nomor);
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!submitted) {
-      setError("Masukkan nomor pengajuan terlebih dahulu.");
-      setData(null);
-      return;
-    }
+  const submitted = normalizeNomor(nomor);
 
-    // Cari data berdasarkan nomor di MOCK_PENGAJUAN
-    const found = MOCK_PENGAJUAN.find((p) => {
-      const normalizedNo = normalizeNomor(p.no);
-      return normalizedNo === submitted;
-    });
+  if (!submitted) {
+    setError("Masukkan nomor pengajuan terlebih dahulu.");
+    setData(null);
+    return;
+  }
 
-    if (found) {
-      setError("");
-      const statusMap = {
-        Menunggu: "Menunggu Persetujuan",
-        Disetujui: "Disetujui",
-        Ditolak: "Ditolak",
-      };
+  const { data: found, error } = await supabase
+    .from("pengajuan_surat")
+    .select("*")
+    .eq("nomor_pengajuan", submitted)
+    .single();
 
-      setData({
-        nama: found.nama,
-        nomorPengajuan: found.no,
-        tanggalPengajuan: found.tgl,
-        jenisLayanan: LAYANAN_TABS_SHORT[found.tab],
-        status: statusMap[found.status],
-        catatanRevisi:
-          found.rejectNotes ||
-          "-",
-        tempatPengambilan: "Kantor Desa Dradah Blumbang",
-        jamPengambilan: "09:00 - 15:00 WIB",
-        kontak: "pemerintahdesadradahblumbang@gmail.com",
-      });
-    } else {
-      setError("Nomor pengajuan tidak ditemukan. Periksa kembali nomor Anda.");
-      setData(null);
-    }
+  if (error || !found) {
+    setError("Nomor pengajuan tidak ditemukan. Periksa kembali nomor Anda.");
+    setData(null);
+    return;
+  }
+
+  setError("");
+
+  const statusMap: any = {
+    Menunggu: "Menunggu Persetujuan",
+    Disetujui: "Disetujui",
+    Ditolak: "Ditolak",
   };
 
+  setData({
+    nama: found.nama_warga,
+    nomorPengajuan: found.nomor_pengajuan,
+    tanggalPengajuan: new Date(found.tanggal_pengajuan).toLocaleDateString("id-ID"),
+    jenisLayanan: found.jenis_surat,
+    status: statusMap[found.status] || found.status,
+    catatanRevisi: found.catatan_revisi || "-",
+    tempatPengambilan: "Kantor Desa Dradah Blumbang",
+    jamPengambilan: "09:00 - 15:00 WIB",
+    kontak: "pemerintahdesadradahblumbang@gmail.com",
+  });
+};
+
+    
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <nav className="text-xs text-gray-400 mb-5">
@@ -152,7 +161,105 @@ export default function StatusPage() {
           <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button
               type="button"
-              onClick={() => window.alert("Fitur download PDF akan segera tersedia.")}
+              onClick={async () => {
+  try {
+    if (!data) {
+      alert("Data belum tersedia");
+      return;
+    }
+
+    // ambil data mentah dari DB (biar konsisten)
+    const { data: pengajuan } = await supabase
+      .from("pengajuan_surat")
+      .select("*")
+      .eq("nomor_pengajuan", data.nomorPengajuan)
+      .single();
+
+    if (!pengajuan) {
+      alert("Data tidak ditemukan di database");
+      return;
+    }
+
+    switch (pengajuan.jenis_surat) {
+      case "sktm": {
+        const detail = await supabase
+          .from("sktm")
+          .select("*")
+          .eq("pengajuan_id", pengajuan.id)
+          .single();
+
+        const pdfBytes = await generateSKTMPDF({
+          nama: detail.data.nama,
+          nik: detail.data.nik,
+          jenisKelamin: detail.data.jenis_kelamin,
+          tempatTanggalLahir: `${detail.data.tempat_lahir}, ${detail.data.tanggal_lahir}`,
+          alamat: detail.data.alamat,
+          keperluan: detail.data.keperluan,
+        });
+
+        const blob = new Blob([new Uint8Array(pdfBytes)], {
+          type: "application/pdf",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+
+        break;
+      }
+
+      case "sku": {
+        const detail = await supabase
+          .from("sku")
+          .select("*")
+          .eq("pengajuan_id", pengajuan.id)
+          .single();
+
+        const pdfBytes = await generateSKUPDF({
+          nama: detail.data.nama,
+          nik: detail.data.nik,
+          jenisKelamin: detail.data.jenis_kelamin,
+          tempatTanggalLahir: `${detail.data.tempat_lahir}, ${detail.data.tanggal_lahir}`,
+          agama: detail.data.agama,
+          alamat: detail.data.alamat,
+          bidang_usaha: detail.data.bidang_usaha,
+        });
+
+        const blob = new Blob([new Uint8Array(pdfBytes)], {
+          type: "application/pdf",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+
+        break;
+      }
+
+      default:
+        alert("PDF untuk jenis surat ini belum tersedia");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Gagal generate PDF");
+  }
+}}
               className="inline-flex items-center justify-center rounded-full bg-[#FFA726] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#fb8c00]"
             >
               Download PDF
