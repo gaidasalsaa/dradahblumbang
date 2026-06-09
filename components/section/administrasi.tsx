@@ -75,15 +75,6 @@ export default function Administrasi() {
           ))}
         </div>
 
-                <div className="flex justify-center mt-10">
-          <Link
-            href="/administrasi/status"
-            className="bg-[#FFA726] hover:bg-[#fb8c00] text-white font-semibold px-10 py-3.5 rounded-full shadow-md transition"
-          >
-            Cek Status Pengajuan
-          </Link>
-        </div>
-
         {/* CTA button
         <div className="flex justify-center mt-10">
           <a
