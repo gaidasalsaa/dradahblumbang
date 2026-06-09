@@ -1,8 +1,17 @@
+// components/administrasi/sukses/page.tsx
+
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
+import { getSKTMData } from "@/lib/pdf/getSKTMData";
+import { getSKUData } from "@/lib/pdf/getSKUData";
+import { generateSKUPDF } from "@/lib/pdf/generateSKU";
+
 import { supabase } from "@/lib/supabase";
+import { useEffect} from "react";
 
 import {
   CheckIcon,
@@ -18,15 +27,146 @@ import {
 export default function SuksesPage() {
   const router = useRouter();
 
-  const [nomorPengajuan] = useState("DOM-2024-001");
-  const [tanggalPengajuan] = useState(() => {
-    const now = new Date();
-    return now.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  });
+  const searchParams = useSearchParams();
+
+  const idPengajuan = searchParams.get("id");
+  const jenisSurat = searchParams.get("jenis");
+
+  const [nomorPengajuan, setNomorPengajuan] = useState("");
+  const [tanggalPengajuan, setTanggalPengajuan] = useState("");
+  const [jenisDokumen, setJenisDokumen] = useState("");
+  const [isDataReady, setIsDataReady] = useState(false);
+
+  useEffect(() => {
+    const fetchPengajuan = async () => {
+      if (!idPengajuan) return;
+
+      const { data, error } = await supabase
+        .from("pengajuan_surat")
+        .select("*")
+        .eq("id", idPengajuan)
+        .single();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setNomorPengajuan(data.nomor_pengajuan);
+      setJenisDokumen(data.jenis_surat);
+      setTanggalPengajuan(
+        new Date(data.tanggal_pengajuan).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      );
+
+      setIsDataReady(true); 
+    };
+
+    fetchPengajuan();
+  }, [idPengajuan]);
+
+  const handleDownload = async () => {
+    try {
+      if (!idPengajuan) {
+        alert("ID pengajuan tidak ditemukan");
+        return;
+      }
+
+      switch (jenisSurat) {
+        case "sktm": {
+          const data = await getSKTMData(idPengajuan);
+
+          const pdfBytes = await generateSKTMPDF({
+            nama: data.nama,
+            nik: data.nik,
+            jenisKelamin: data.jenis_kelamin,
+            tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
+            alamat: data.alamat,
+            keperluan: data.keperluan,
+          });
+
+          const blob = new Blob(
+            [new Uint8Array(pdfBytes)],
+            {
+              type: "application/pdf",
+            }
+          );
+
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+
+          a.href = url;
+          a.download = `${nomorPengajuan}.pdf`;
+
+          document.body.appendChild(a);
+
+          a.click();
+
+          a.remove();
+
+          URL.revokeObjectURL(url);
+
+          break;
+        }
+
+        case "sku": {
+        const data = await getSKUData(idPengajuan);
+        const pdfBytes = await generateSKUPDF({
+          nama: data.nama,
+          nik: data.nik,
+          jenisKelamin: data.jenis_kelamin,
+          tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
+          agama: data.agama,
+          alamat: data.alamat,
+          bidang_usaha: data.bidang_usaha,
+        });
+        // download blob sama seperti sktm...
+        break;
+      }
+
+      // case "domisili": {
+      //   const data = await getDomisiliData(idPengajuan);
+      //   const pdfBytes = await generateDomisiliPDF({
+      //     nama: data.nama,
+      //     nik: data.nik,
+      //     jenisKelamin: data.jenis_kelamin,
+      //     tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
+      //     pekerjaan: data.pekerjaan,
+      //     status: data.status,
+      //     alamat: data.alamat,
+      //     keperluan: data.keperluan,
+      //   });
+      //   // download blob...
+      //   break;
+      // }
+
+      // case "skck": {
+      //   const data = await getSKCKData(idPengajuan);
+      //   const pdfBytes = await generateSKCKPDF({
+      //     nama: data.nama,
+      //     nik: data.nik,
+      //     jenisKelamin: data.jenis_kelamin,
+      //     tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
+      //     agama: data.agama,
+      //     alamat: data.alamat,
+      //     keperluan: data.keperluan,
+      //   });
+      //   // download blob...
+      //   break;
+      // }
+
+        default:
+          alert("Generate PDF untuk surat ini belum tersedia");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Gagal generate PDF");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
@@ -55,7 +195,7 @@ export default function SuksesPage() {
             <div>
               <p className="text-xs text-gray-400 mb-1">Nomor Pengajuan</p>
               <p className="text-sm font-bold text-green-700">
-                #{nomorPengajuan}
+                {nomorPengajuan}
               </p>
             </div>
             <div>
@@ -67,22 +207,27 @@ export default function SuksesPage() {
           </div>
           <div>
             <p className="text-xs text-gray-400 mb-1">Jenis Dokumen</p>
-            <p className="text-sm font-bold text-green-700">Surat Domisili</p>
+            <p className="text-sm font-bold text-green-700">{jenisDokumen}</p>
           </div>
         </div>
 
         {/* Tombol Download PDF */}
         <button
-          onClick={() => alert("Fitur download PDF segera hadir")}
-          className="w-full bg-amber-400 hover:bg-amber-500 text-white rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 mb-3 transition-colors shadow-sm"
+          onClick={handleDownload}
+          disabled={!isDataReady}  // ← disable sampai data siap
+          className={`w-full rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 mb-3 transition-colors shadow-sm ${
+            isDataReady
+              ? "bg-amber-400 hover:bg-amber-500 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
           <ArrowDownTrayIcon className="w-4 h-4" />
-          Download PDF
+          {isDataReady ? "Download PDF" : "Memuat data..."}
         </button>
 
         {/* Tombol Cek Status */}
         <button
-          onClick={() => router.push("/administrasi/status")}
+          onClick={() => router.push(`/administrasi/status?nomor=${nomorPengajuan}`)}
           className="w-full bg-white border-2 border-amber-400 text-amber-500 hover:bg-amber-50 rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 mb-5 transition-colors"
         >
           <MagnifyingGlassIcon className="w-4 h-4" />

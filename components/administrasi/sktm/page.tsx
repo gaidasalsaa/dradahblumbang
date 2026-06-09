@@ -1,3 +1,5 @@
+// components/administrasi/sktm/page.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -13,7 +15,6 @@ export default function FormSKTM() {
     jenisKelamin: "",
     tempatLahir: "",
     tanggalLahir: "",
-    agama: "",
     alamat: "",
     keperluan: "",
   });
@@ -31,7 +32,6 @@ export default function FormSKTM() {
       jenisKelamin: "",
       tempatLahir: "",
       tanggalLahir: "",
-      agama: "",
       alamat: "",
       keperluan: "",
     });
@@ -47,26 +47,66 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   setLoading(true);
-  const { error } = await supabase.from("pengajuan_surat").insert({
-    nama_warga: form.nama,
-    nik: form.nik,
-    jenis_surat: "sktm",
-    status: "Menunggu",
-    // simpan detail tambahan sebagai catatan (opsional)
-    catatan_revisi: null,
-    file_url: null,
-  });
 
-  setLoading(false);
+  try {
+    // 1. GENERATE NOMOR SEMENTARA SEBELUM INSERT
+    // Pakai timestamp + random 3 digit supaya tidak collision
+    const today = new Date();
+    const tanggal =
+      today.getFullYear().toString() +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      String(today.getDate()).padStart(2, "0");
+    const randomSuffix = String(Math.floor(Math.random() * 900) + 100); // 100-999
+    const nomorPengajuan = `SKTM-${tanggal}-${randomSuffix}`;
 
-  if (error) {
-    alert("Gagal mengirim pengajuan. Coba lagi.");
-    console.error(error);
-    return;
+    // 2. INSERT SEKALIGUS DENGAN NOMOR PENGAJUAN
+    const { data: pengajuanData, error: pengajuanError } = await supabase
+      .from("pengajuan_surat")
+      .insert([
+        {
+          nama_warga: form.nama,
+          nik: form.nik,
+          jenis_surat: "sktm",
+          tanggal_pengajuan: new Date().toISOString(),
+          status: "Menunggu",
+          nomor_pengajuan: nomorPengajuan, // ← langsung diisi, tidak NULL
+        },
+      ])
+      .select()
+      .single();
+
+    if (pengajuanError) throw new Error("Gagal membuat pengajuan: " + pengajuanError.message);
+    console.log("ID yang akan dikirim ke sktm:", pengajuanData.id);
+
+    // 3. INSERT KE TABEL SKTM
+    const { error: sktmError } = await supabase
+      .from("sktm")
+      .insert([
+        {
+          pengajuan_id: pengajuanData.id,
+          nama: form.nama,
+          nik: form.nik,
+          jenis_kelamin: form.jenisKelamin,
+          tempat_lahir: form.tempatLahir,
+          tanggal_lahir: form.tanggalLahir,
+          alamat: form.alamat,
+          keperluan: form.keperluan,
+        },
+      ]);
+
+    if (sktmError) throw new Error("Gagal menyimpan data SKTM: " + sktmError.message);
+
+    // 4. REDIRECT
+    router.push(`/administrasi/sukses?id=${pengajuanData.id}&jenis=sktm`);
+
+  } catch (err) {
+    console.error(err);
+    alert(err instanceof Error ? err.message : "Terjadi kesalahan, silakan coba lagi.");
+  } finally {
+    setLoading(false);
   }
-
-  router.push("/administrasi/sukses");
 };
+
 
   const inputClass =
     "w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400";
@@ -82,7 +122,6 @@ const handleSubmit = async (e: React.FormEvent) => {
   form.jenisKelamin.trim() !== "" &&
   form.tempatLahir.trim() !== "" &&
   form.tanggalLahir.trim() !== "" &&
-  form.agama.trim() !== "" &&
   form.keperluan.trim() !== "" &&
   form.alamat.trim() !== "";
 
@@ -94,7 +133,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         <span className="mx-1">&gt;</span>
         <span>Administrasi</span>
         <span className="mx-1">&gt;</span>
-        <span className="text-green-700 font-semibold">Surat Domisili</span>
+        <span className="text-green-700 font-semibold">Surat Keterangan Tidak Mampu (SKTM)</span>
       </nav>
 
       {/* Page Title */}
@@ -204,29 +243,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* Agama */}
-          <div className="mb-4">
-            <label className={labelClass}>Agama *</label>
-            <div className="relative w-1/2">
-              <select
-                name="agama"
-                value={form.agama}
-                onChange={handleChange}
-                className={selectClass}
-                required
-              >
-                <option value="" disabled></option>
-                <option value="Islam">Islam</option>
-                <option value="Kristen">Kristen</option>
-                <option value="Katolik">Katolik</option>
-                <option value="Hindu">Hindu</option>
-                <option value="Buddha">Buddha</option>
-                <option value="Konghucu">Konghucu</option>
-              </select>
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▼</span>
-            </div>
-          </div>
-
+          
           {/* Alamat Lengkap */}
           <div className="mb-4">
             <label className={labelClass}>Alamat Lengkap *</label>
