@@ -1,15 +1,7 @@
-// components/administrasi/sukses/page.tsx
-
 "use client";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
-import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
-import { getSKTMData } from "@/lib/pdf/getSKTMData";
-import { getSKUData } from "@/lib/pdf/getSKUData";
-import { generateSKUPDF } from "@/lib/pdf/generateSKU";
-
 import { supabase } from "@/lib/supabase";
 import { useEffect} from "react";
 
@@ -35,139 +27,101 @@ export default function SuksesPage() {
   const [nomorPengajuan, setNomorPengajuan] = useState("");
   const [tanggalPengajuan, setTanggalPengajuan] = useState("");
   const [jenisDokumen, setJenisDokumen] = useState("");
-  const [isDataReady, setIsDataReady] = useState(false);
+  const [status, setStatus] = useState("");
+  const [isApproved, setIsApproved] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!idPengajuan) return;
+
+    // Fetch initial data
     const fetchPengajuan = async () => {
-      if (!idPengajuan) return;
+      try {
+        const { data, error } = await supabase
+          .from("pengajuan_surat")
+          .select("*")
+          .eq("id", idPengajuan)
+          .single();
 
-      const { data, error } = await supabase
-        .from("pengajuan_surat")
-        .select("*")
-        .eq("id", idPengajuan)
-        .single();
+        if (error) {
+          console.error("Fetch error:", error);
+          return;
+        }
 
-      if (error) {
-        console.error(error);
-        return;
+        setNomorPengajuan(data.nomor_pengajuan);
+        setJenisDokumen(data.jenis_surat);
+        setStatus(data.status);
+        setIsApproved(data.status === "Disetujui");
+        setFileUrl(data.file_url ?? null)
+        setTanggalPengajuan(
+          new Date(data.tanggal_pengajuan).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        );
+      } catch (e) {
+        console.error("Fetch error:", e);
       }
-
-      setNomorPengajuan(data.nomor_pengajuan);
-      setJenisDokumen(data.jenis_surat);
-      setTanggalPengajuan(
-        new Date(data.tanggal_pengajuan).toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        })
-      );
-
-      setIsDataReady(true); 
     };
 
     fetchPengajuan();
+
+    // Aggressive polling every 1 second while waiting for approval
+    const pollInterval = setInterval(async () => {
+      try {
+        const { data } = await supabase
+          .from("pengajuan_surat")
+          .select('status, file_url')
+          .eq("id", idPengajuan)
+          .single();
+
+        if (data?.status) {
+          console.log("Poll detected status:", data.status);
+          setStatus(data.status);
+          setIsApproved(data.status === "Disetujui");
+          setFileUrl(data.file_url ?? null) 
+        }
+      } catch (e) {
+        console.error("Poll error:", e);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(pollInterval);
+    };
   }, [idPengajuan]);
 
   const handleDownload = async () => {
-    try {
-      if (!idPengajuan) {
-        alert("ID pengajuan tidak ditemukan");
-        return;
-      }
+  try {
+    setIsDownloading(true)
 
-      switch (jenisSurat) {
-        case "sktm": {
-          const data = await getSKTMData(idPengajuan);
-
-          const pdfBytes = await generateSKTMPDF({
-            nama: data.nama,
-            nik: data.nik,
-            jenisKelamin: data.jenis_kelamin,
-            tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
-            alamat: data.alamat,
-            keperluan: data.keperluan,
-          });
-
-          const blob = new Blob(
-            [new Uint8Array(pdfBytes)],
-            {
-              type: "application/pdf",
-            }
-          );
-
-          const url = URL.createObjectURL(blob);
-
-          const a = document.createElement("a");
-
-          a.href = url;
-          a.download = `${nomorPengajuan}.pdf`;
-
-          document.body.appendChild(a);
-
-          a.click();
-
-          a.remove();
-
-          URL.revokeObjectURL(url);
-
-          break;
-        }
-
-        case "sku": {
-        const data = await getSKUData(idPengajuan);
-        const pdfBytes = await generateSKUPDF({
-          nama: data.nama,
-          nik: data.nik,
-          jenisKelamin: data.jenis_kelamin,
-          tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
-          agama: data.agama,
-          alamat: data.alamat,
-          bidang_usaha: data.bidang_usaha,
-        });
-        // download blob sama seperti sktm...
-        break;
-      }
-
-      // case "domisili": {
-      //   const data = await getDomisiliData(idPengajuan);
-      //   const pdfBytes = await generateDomisiliPDF({
-      //     nama: data.nama,
-      //     nik: data.nik,
-      //     jenisKelamin: data.jenis_kelamin,
-      //     tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
-      //     pekerjaan: data.pekerjaan,
-      //     status: data.status,
-      //     alamat: data.alamat,
-      //     keperluan: data.keperluan,
-      //   });
-      //   // download blob...
-      //   break;
-      // }
-
-      // case "skck": {
-      //   const data = await getSKCKData(idPengajuan);
-      //   const pdfBytes = await generateSKCKPDF({
-      //     nama: data.nama,
-      //     nik: data.nik,
-      //     jenisKelamin: data.jenis_kelamin,
-      //     tempatTanggalLahir: `${data.tempat_lahir}, ${data.tanggal_lahir}`,
-      //     agama: data.agama,
-      //     alamat: data.alamat,
-      //     keperluan: data.keperluan,
-      //   });
-      //   // download blob...
-      //   break;
-      // }
-
-        default:
-          alert("Generate PDF untuk surat ini belum tersedia");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Gagal generate PDF");
+    if (!idPengajuan) {
+      alert("ID pengajuan tidak ditemukan")
+      return
     }
-  };
 
+    // Pakai file_url dari Storage kalau sudah ada
+    if (fileUrl) {
+      const a = document.createElement('a')
+      a.href = fileUrl
+      a.download = `${nomorPengajuan}.pdf`
+      a.target = '_blank'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      return
+    }
+
+    alert('PDF belum tersedia, tunggu persetujuan admin.')
+  } catch (error) {
+    console.error(error)
+    alert('Gagal download PDF')
+  } finally {
+    setIsDownloading(false)
+  }
+}
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-10">
       <div className="bg-white rounded-2xl shadow-md p-10 max-w-md w-full text-center">
@@ -205,24 +159,34 @@ export default function SuksesPage() {
               </p>
             </div>
           </div>
-          <div>
-            <p className="text-xs text-gray-400 mb-1">Jenis Dokumen</p>
-            <p className="text-sm font-bold text-green-700">{jenisDokumen}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-gray-400 mb-1">Jenis Dokumen</p>
+              <p className="text-sm font-bold text-green-700">{jenisDokumen}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 mb-1">Status</p>
+              <p className={`text-sm font-bold ${
+                isApproved ? "text-green-700" : "text-amber-600"
+              }`}>
+                {status || "Memuat..."}
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Tombol Download PDF */}
         <button
           onClick={handleDownload}
-          disabled={!isDataReady}  // ← disable sampai data siap
+          disabled={!isApproved || isDownloading}
           className={`w-full rounded-lg py-3 text-sm font-semibold flex items-center justify-center gap-2 mb-3 transition-colors shadow-sm ${
-            isDataReady
-              ? "bg-amber-400 hover:bg-amber-500 text-white"
+            isApproved && !isDownloading
+              ? "bg-amber-400 hover:bg-amber-500 text-white cursor-pointer"
               : "bg-gray-300 text-gray-500 cursor-not-allowed"
           }`}
         >
           <ArrowDownTrayIcon className="w-4 h-4" />
-          {isDataReady ? "Download PDF" : "Memuat data..."}
+          {isDownloading ? "Membuat PDF..." : !isApproved ? "Menunggu Persetujuan Admin" : "Download PDF"}
         </button>
 
         {/* Tombol Cek Status */}

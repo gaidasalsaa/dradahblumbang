@@ -10,15 +10,6 @@ interface Props {
   onClose: () => void
 }
 
-function CheckCircleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-      <polyline points="22 4 12 14.01 9 11.01" />
-    </svg>
-  )
-}
-
 function SendIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -74,9 +65,6 @@ export default function ModalKonfirmasi({ type, item, onConfirm, onClose }: Prop
       >
         {/* Header */}
         <div className={`flex items-center gap-3 px-6 py-4 border-b border-[#E5E7EB] ${isTolak ? 'bg-[#FFEBEE]' : 'bg-[#F1F8E9]'}`}>
-          <div className={`w-9 h-9 rounded-[9px] flex items-center justify-center ${isTolak ? 'bg-[#EF9A9A] text-[#C62828]' : 'bg-[#C5E1A5] text-[#33691E]'}`}>
-            {isTolak ? <span className="text-[18px]">📝</span> : <CheckCircleIcon />}
-          </div>
           <h2 className="text-[15px] font-bold text-[#1A2E1A]">
             {isTolak ? 'Tolak & Kirim Catatan Revisi' : 'Konfirmasi Persetujuan'}
           </h2>
@@ -100,7 +88,7 @@ export default function ModalKonfirmasi({ type, item, onConfirm, onClose }: Prop
               <textarea
                 value={notes}
                 onChange={e => { setNotes(e.target.value); setError(false) }}
-                placeholder="Contoh: Foto KTP kurang jelas, mohon upload ulang..."
+                placeholder="Contoh: NIK tidak valid, alamat kurang lengkap, ..."
                 rows={4}
                 className={`w-full resize-y rounded-xl border px-3.5 py-2.5 text-[13px] text-[#1A2E1A] outline-none transition-colors leading-relaxed
                   ${error ? 'border-[#C62828] focus:border-[#C62828]' : 'border-[#E5E7EB] focus:border-[#558B2F]'}`}

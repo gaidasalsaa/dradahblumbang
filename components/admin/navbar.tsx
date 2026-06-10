@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useAdmin } from '../../lib/adminContext'
 import AdminNotifPanel from './notifpanel'
 import Image from 'next/image'
+import { supabase } from '@/lib/supabase'
 
 function BellIcon() {
   return (
@@ -97,9 +98,6 @@ export default function AdminTopbar() {
             onClick={() => { setProfileOpen(v => !v); setNotifOpen(false) }}
             className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-[10px] px-3 py-1.5 text-white hover:bg-white/20 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-[#FFA726] text-[#33691E] text-xs font-bold flex items-center justify-center shrink-0">
-              A
-            </div>
             <span className="text-[15px] font-medium hidden sm:inline">Admin</span>
             <ChevronDownIcon />
           </button>
@@ -107,7 +105,10 @@ export default function AdminTopbar() {
           {profileOpen && (
             <div className="absolute right-0 top-[calc(100%+8px)] bg-white border border-[#E5E7EB] rounded-xl shadow-xl min-w-[150px] overflow-hidden z-50">
               <button
-                onClick={() => alert('Keluar dari sistem...')}
+                onClick={async () => {
+                  await supabase.auth.signOut()
+                  window.location.href = '/auth/login' // sesuaikan path login kamu
+                }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-[#C62828] hover:bg-[#FFEBEE] transition-colors"
               >
                 <LogoutIcon />

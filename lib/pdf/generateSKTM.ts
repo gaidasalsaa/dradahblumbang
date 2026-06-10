@@ -10,6 +10,7 @@ interface SKTMData {
   tempatTanggalLahir: string;
   alamat: string;
   keperluan: string;
+  tanggal: string
 }
 
 export async function generateSKTMPDF(data: SKTMData) {
@@ -73,6 +74,13 @@ export async function generateSKTMPDF(data: SKTMData) {
     y: 527,
     size: 12,
     font: timesRomanFont,
+  });
+
+  page.drawText(data.tanggal, { 
+    x: 418, 
+    y: 430, 
+    size: 12, 
+    font: timesRomanFont, 
   });
 
   return await pdfDoc.save();
