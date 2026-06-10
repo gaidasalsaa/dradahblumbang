@@ -21,7 +21,7 @@ function NotifItem({ item, onMark }: { item: Notifikasi; onMark: (id: string) =>
           {item.nama}
         </p>
         <p className="text-[11.5px] text-[#6B7280] mt-0.5">
-          {['Surat Tdk Mampu', 'Surat Domisili', 'Surat Usaha', 'Surat SKCK'][item.jenis]}
+          {['Surat Keterangan Tidak Mampu', 'Surat Keterangan Domisili', 'Surat Keterangan Usaha', 'Surat PengantarSKCK'][item.jenis]}
         </p>
         <p className="text-[11px] text-[#9CA3AF] mt-0.5">
           {item.waktu}
@@ -42,14 +42,17 @@ export default function AdminNotifPanel({ onClose }: Props) {
           Pengajuan Masuk
         </span>
         {unreadCount > 0 && (
-          <span className="text-[10px] font-bold bg-[#FFA726] text-[#33691E] px-2 py-0.5 rounded-full">
-            {unreadCount} baru
-          </span>
+          <button
+            onClick={() => notifikasi.forEach(n => markNotifRead(n.id))}
+            className="w-full text-[11px] text-[#6B7280] hover:text-[#33691E] py-2 border-b border-[#E5E7EB] transition-colors"
+          >
+            Tandai semua dibaca
+          </button>
         )}
       </div>
 
       {/* Items */}
-      <div>
+      <div className="max-h-[400px] overflow-y-auto">
         {notifikasi.map(n => (
           <NotifItem key={n.id} item={n} onMark={markNotifRead} />
         ))}

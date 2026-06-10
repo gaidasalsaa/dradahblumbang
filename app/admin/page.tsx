@@ -8,7 +8,7 @@ import AdminTableSection from '../../components/admin/table-section'
 import ModalKonfirmasi from '../../components/admin/modal-konfirmasi'
 
 export default function AdminDashboardPage() {
-  const { updateStatus, addToast } = useAdmin()
+  const { updateStatus } = useAdmin()
 
   // Tab & filter state
   const [activeTab, setActiveTab]       = useState<LayananTab>(0)
@@ -27,21 +27,17 @@ export default function AdminDashboardPage() {
   }, [])
 
   // Approve flow
-  const handleConfirmSetuju = useCallback(() => {
-    if (!modalSetujuItem) return
-    updateStatus(modalSetujuItem.id, 'Disetujui')
-    addToast('success', `Pengajuan ${modalSetujuItem.nama} telah disetujui.`)
-    setModalSetujuItem(null)
-  }, [modalSetujuItem, updateStatus, addToast])
+const handleConfirmSetuju = useCallback(() => {
+  if (!modalSetujuItem) return
+  updateStatus(modalSetujuItem.id, 'Disetujui')
+  setModalSetujuItem(null)
+}, [modalSetujuItem, updateStatus])
 
-  // Reject flow
-  const handleSendTolak = useCallback((notes: string) => {
-    if (!modalTolakItem) return
-    updateStatus(modalTolakItem.id, 'Ditolak', notes)
-    addToast('error', `Catatan revisi berhasil dikirim ke ${modalTolakItem.nama}.`)
-    setModalTolakItem(null)
-  }, [modalTolakItem, updateStatus, addToast])
-
+const handleSendTolak = useCallback((notes: string) => {
+  if (!modalTolakItem) return
+  updateStatus(modalTolakItem.id, 'Ditolak', notes)
+  setModalTolakItem(null)
+}, [modalTolakItem, updateStatus])
   return (
     <main className="w-full px-6 py-7 pb-16 min-h-screen">
       {/* Page Header */}
@@ -60,7 +56,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Tabs + Filter + Table — sekarang 1 komponen */}
-      <AdminTableSection                      // ← ganti 2 komponen jadi 1
+      <AdminTableSection                      
         activeTab={activeTab}
         onTabChange={handleTabChange}
         search={search}
@@ -81,7 +77,7 @@ export default function AdminDashboardPage() {
       <ModalKonfirmasi
         type="tolak"
         item={modalTolakItem}
-        onConfirm={(notes) => handleSendTolak(notes!)}
+        onConfirm={(notes) => handleSendTolak(notes ?? '')}
         onClose={() => setModalTolakItem(null)}
       />
     </main>

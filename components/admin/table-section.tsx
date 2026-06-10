@@ -89,7 +89,7 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
     <tr className="hover:bg-[#FAFDF7] transition-colors border-b border-[#F3F4F6] last:border-b-0">
       {/* ID Pengajuan */}
       <td className="px-5 py-5 text-base text-[#6B7280] font-mono whitespace-nowrap text-center align-middle">
-        {item.id}
+        {item.nomorPengajuan ?? item.id.slice(0, 8)}
       </td>
 
       {/* Nama */}
@@ -106,11 +106,22 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
       {/* Download PDF */}
       <td className="px-5 py-5 text-center align-middle">
         <button
-          onClick={() => alert(`Membuka PDF pengajuan ${item.nama}...`)}
-          className="flex items-center justify-center gap-2 w-full border border-[#33691E] text-[#33691E] rounded-lg px-4 py-2 text-base font-semibold hover:bg-[#F1F8E9] transition-colors whitespace-nowrap"
+          onClick={async () => {
+            if (item.file_url) {
+              window.open(item.file_url, '_blank')
+            } else {
+              alert('PDF belum tersedia. Setujui pengajuan dulu untuk generate PDF.')
+            }
+          }}
+          disabled={!item.file_url}
+          className={`flex items-center justify-center gap-2 w-full border rounded-lg px-4 py-2 text-base font-semibold transition-colors whitespace-nowrap
+            ${item.file_url
+              ? 'border-[#33691E] text-[#33691E] hover:bg-[#F1F8E9] cursor-pointer'
+              : 'border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed'
+            }`}
         >
           <DownloadIcon />
-          Download PDF
+          {item.file_url ? 'Download PDF' : 'Belum Ada PDF'}
         </button>
       </td>
 
@@ -142,7 +153,7 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
             onClick={() => onTolak(item)}
             className="w-full flex items-center justify-center gap-2 bg-[#E8EAF6] text-[#283593] border border-[#C5CAE9] rounded-lg py-2 text-base font-semibold hover:bg-[#C5CAE9] transition-colors"
           >
-            <EditIcon /> Kirim Revisi
+            <EditIcon /> Edit Revisi
           </button>
         )}
         {item.status === 'Disetujui' && (
