@@ -18,9 +18,7 @@ import {
 
 export default function SuksesPage() {
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const idPengajuan = searchParams.get("id");
   const jenisSurat = searchParams.get("jenis");
 
