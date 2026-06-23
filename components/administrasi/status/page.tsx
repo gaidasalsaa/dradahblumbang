@@ -254,6 +254,45 @@ export default function StatusPage() {
         break;
       }
 
+      // TEMPLATE SKCK
+      //case "skCK": {
+      //   const detail = await supabase
+      //     .from("skCK")
+      //     .select("*")
+      //     .eq("pengajuan_id", pengajuan.id)
+      //     .single();
+
+      //   const pdfBytes = await generateSKCKPDF({
+      //     nama: detail.data.nama,
+      //     nik: detail.data.nik,
+      //     jenisKelamin: detail.data.jenis_kelamin,
+      //     tempatTanggalLahir: detail.data.tempatTanggalLahir,
+      //     agama: detail.data.agama,
+      //     pekerjaan: detail.data.pekerjaan,
+      //     alamat: detail.data.alamat,
+      //     keperluan: detail.data.keperluan,
+      //     tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
+      //   });
+
+      //   const blob = new Blob([new Uint8Array(pdfBytes)], {
+      //     type: "application/pdf",
+      //   });
+
+      //   const url = URL.createObjectURL(blob);
+      //   const a = document.createElement("a");
+
+      //   a.href = url;
+      //   a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   a.remove();
+
+      //   URL.revokeObjectURL(url);
+
+      //   break;
+      // }
+
       default:
         alert("PDF untuk jenis surat ini belum tersedia");
     }
