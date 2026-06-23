@@ -255,9 +255,9 @@ export default function StatusPage() {
       }
 
       // TEMPLATE SKCK
-      //case "skCK": {
+      //case "skck": {
       //   const detail = await supabase
-      //     .from("skCK")
+      //     .from("skck")
       //     .select("*")
       //     .eq("pengajuan_id", pengajuan.id)
       //     .single();
@@ -270,6 +270,45 @@ export default function StatusPage() {
       //     agama: detail.data.agama,
       //     pekerjaan: detail.data.pekerjaan,
       //     alamat: detail.data.alamat,
+      //     keperluan: detail.data.keperluan,
+      //     tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
+      //   });
+
+      //   const blob = new Blob([new Uint8Array(pdfBytes)], {
+      //     type: "application/pdf",
+      //   });
+
+      //   const url = URL.createObjectURL(blob);
+      //   const a = document.createElement("a");
+
+      //   a.href = url;
+      //   a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   a.remove();
+
+      //   URL.revokeObjectURL(url);
+
+      //   break;
+      // }
+
+      // TEMPLATE domisili
+      //case "domisili": {
+      //   const detail = await supabase
+      //     .from("domisili")
+      //     .select("*")
+      //     .eq("pengajuan_id", pengajuan.id)
+      //     .single();
+
+      //   const pdfBytes = await generateSKCKPDF({
+      //     nama: detail.data.nama,
+      //     nik: detail.data.nik,
+      //     jenisKelamin: detail.data.jenis_kelamin,
+      //     tempatTanggalLahir: detail.data.tempatTanggalLahir,
+      //     agama: detail.data.agama,
+      //     alamat: detail.data.alamat,
+      //     keterangan: detail.data.keterangan,
       //     keperluan: detail.data.keperluan,
       //     tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
       //   });
