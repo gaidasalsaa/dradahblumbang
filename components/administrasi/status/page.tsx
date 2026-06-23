@@ -104,7 +104,7 @@ export default function StatusPage() {
                 type="text"
                 value={nomor}
                 onChange={(event) => setNomor(event.target.value)}
-                placeholder="Contoh: 001"
+                placeholder="Contoh: p001"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:border-green-400 focus:ring-1 focus:ring-green-400"
               />
             </div>
@@ -192,9 +192,10 @@ export default function StatusPage() {
           nama: detail.data.nama,
           nik: detail.data.nik,
           jenisKelamin: detail.data.jenis_kelamin,
-          tempatTanggalLahir: `${detail.data.tempat_lahir}, ${detail.data.tanggal_lahir}`,
+          tempatTanggalLahir: detail.data.tempatTanggalLahir,
           alamat: detail.data.alamat,
           keperluan: detail.data.keperluan,
+          tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
         });
 
         const blob = new Blob([new Uint8Array(pdfBytes)], {
@@ -227,10 +228,11 @@ export default function StatusPage() {
           nama: detail.data.nama,
           nik: detail.data.nik,
           jenisKelamin: detail.data.jenis_kelamin,
-          tempatTanggalLahir: `${detail.data.tempat_lahir}, ${detail.data.tanggal_lahir}`,
+          tempatTanggalLahir: detail.data.tempatTanggalLahir,
           agama: detail.data.agama,
           alamat: detail.data.alamat,
           bidang_usaha: detail.data.bidang_usaha,
+          tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
         });
 
         const blob = new Blob([new Uint8Array(pdfBytes)], {
