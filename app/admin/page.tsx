@@ -55,7 +55,7 @@ const handleSendTolak = useCallback((notes: string) => {
         <AdminStatCards />
       </div>
 
-      {/* Tabs + Filter + Table — sekarang 1 komponen */}
+      {/* Tabs + Filter + Table */}
       <AdminTableSection                      
         activeTab={activeTab}
         onTabChange={handleTabChange}

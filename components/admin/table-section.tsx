@@ -91,13 +91,11 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
   const [isLoadingPdf, setIsLoadingPdf] = useState(false)
 
   const handleDownload = async (item: Pengajuan) => {
-    // Sudah disetujui → langsung buka PDF resmi (ini juga yang dikirim ke warga)
     if (item.file_url) {
       window.open(item.file_url, '_blank')
       return
     }
 
-    // Belum disetujui → generate preview on-the-fly, tanpa upload/simpan
     setIsLoadingPdf(true)
     try {
       const { data: raw, error } = await supabase
