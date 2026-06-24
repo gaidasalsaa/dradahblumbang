@@ -1,9 +1,14 @@
-import Sukses from "@/components/administrasi/sukses/page";
+import { Suspense } from "react";
+import SuksesContent from "@/components/administrasi/sukses/page";
 
 export default function SuksesPage() {
   return (
-    <main className="min-h-screen bg-white">
-        <Sukses />
-    </main>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">
+        Memuat...
+      </div>
+    }>
+      <SuksesContent />
+    </Suspense>
   );
 }

@@ -8,13 +8,17 @@ export default function TestPDFPage() {
     const data = await getSKTMData("1");
 
     const pdfBytes = await generateSKTMPDF({
-    nama: data.nama,
-    nik: data.nik,
-    jenisKelamin: data.jenis_kelamin,
-    tempatTanggalLahir:
-        `${data.tempat_lahir}, ${data.tanggal_lahir}`,
-    alamat: data.alamat,
-    keperluan: data.keperluan,
+      nama: data.nama,
+      nik: data.nik,
+      jenisKelamin: data.jenis_kelamin,
+      tempatTanggalLahir: `${data.tempat_lahir}, ${new Date(data.tanggal_lahir).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`,
+      alamat: data.alamat,
+      keperluan: data.keperluan,
+      tanggal: new Date().toLocaleDateString("id-ID", {  // ← ini yang kurang
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
     });
 
     const blob = new Blob(

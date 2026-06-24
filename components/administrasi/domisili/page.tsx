@@ -4,42 +4,23 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabase'
 
-type AnggotaKeluarga = {
-  nama: string;
-  nik: string;
-  jenisKelamin: string;
-  tempatLahir: string;
-  tanggalLahir: string;
-  pekerjaan: string;
-  statusPerkawinan: string;
-  alamat: string;
-};
-
 type FormData = {
   nama: string;
   nik: string;
   jenisKelamin: string;
   tempatLahir: string;
   tanggalLahir: string;
-  pekerjaan: string;
-  statusPerkawinan: string;
+  agama: string;
   alamat: string;
-  anggota: AnggotaKeluarga[];
+  rt: string;
+  rw: string;
+  dusun: string;
+  keperluan: string;
 };
 
 export default function FormDomisili() {
   const router = useRouter();
-
-  const initialAnggota = {
-    nama: "",
-    nik: "",
-    jenisKelamin: "",
-    tempatLahir: "",
-    tanggalLahir: "",
-    pekerjaan: "",
-    statusPerkawinan: "",
-    alamat: "",
-  };
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<FormData>({
     nama: "",
@@ -47,42 +28,18 @@ export default function FormDomisili() {
     jenisKelamin: "",
     tempatLahir: "",
     tanggalLahir: "",
-    pekerjaan: "",
-    statusPerkawinan: "",
+    agama: "",
     alamat: "",
-    anggota: [],
+    rt: "",
+    rw: "",
+    dusun: "",
+    keperluan: "",
   });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleAnggotaChange = (
-    index: number,
-    field: keyof AnggotaKeluarga,
-    value: string
-  ) => {
-    const newAnggota = [...form.anggota];
-    newAnggota[index][field] = value;
-
-    setForm({
-      ...form,
-      anggota: newAnggota,
-    });
-  };
-
-  const addAnggota = () => {
-    setForm({
-      ...form,
-      anggota: [...form.anggota, { ...initialAnggota }],
-    });
-  };
-
-  const removeAnggota = (index: number) => {
-    const newAnggota = form.anggota.filter((_, i) => i !== index);
-    setForm({ ...form, anggota: newAnggota });
   };
 
   const handleReset = () => {
@@ -92,44 +49,103 @@ export default function FormDomisili() {
       jenisKelamin: "",
       tempatLahir: "",
       tanggalLahir: "",
-      pekerjaan: "",
-      statusPerkawinan: "",
+      agama: "",
       alamat: "",
-      anggota: [],
+      rt: "",
+      rw: "",
+      dusun: "",
+      keperluan: "",
     });
   };
 
-  // KE
-const [loading, setLoading] = useState(false);
+  const isFormValid =
+    form.nama.trim() !== "" &&
+    form.nik.trim() !== "" &&
+    form.jenisKelamin.trim() !== "" &&
+    form.tempatLahir.trim() !== "" &&
+    form.tanggalLahir.trim() !== "" &&
+    form.agama.trim() !== "" &&
+    form.alamat.trim() !== "" &&
+    form.rt.trim() !== "" &&
+    form.rw.trim() !== "" &&
+    form.dusun.trim() !== "" &&
+    form.keperluan.trim() !== "";
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!isFormValid) {
-    alert("Mohon lengkapi seluruh data terlebih dahulu.");
-    return;
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isFormValid) {
+      alert("Mohon lengkapi seluruh data terlebih dahulu.");
+      return;
+    }
 
-  setLoading(true);
-  const { error } = await supabase.from("pengajuan_surat").insert({
-    nama_warga: form.nama,
-    nik: form.nik,
-    jenis_surat: "domisili",
-    status: "Menunggu",
-    // simpan detail tambahan sebagai catatan (opsional)
-    catatan_revisi: null,
-    file_url: null,
-  });
+    setLoading(true);
 
-  setLoading(false);
+    const today = new Date();
 
-  if (error) {
-    alert("Gagal mengirim pengajuan. Coba lagi.");
-    console.error(error);
-    return;
-  }
+    const tanggal =
+      today.getFullYear().toString() +
+      String(today.getMonth() + 1).padStart(2, "0") +
+      String(today.getDate()).padStart(2, "0");
 
-  router.push("/administrasi/sukses");
-};
+    const nomorPengajuan =
+    `DOM-${tanggal}-${Date.now().toString().slice(-4)}`;
+
+    // 1. Insert ke tabel pengajuan_surat dulu untuk mendapat pengajuan_id
+    const { data: pengajuan, error: pengajuanError } = await supabase
+      .from("pengajuan_surat")
+      .insert({
+        nama_warga: form.nama,
+        nik: form.nik,
+        jenis_surat: "domisili",
+        nomor_pengajuan: nomorPengajuan,
+        status: "Menunggu",
+        catatan_revisi: null,
+        file_url: null,
+      })
+      .select("id")
+      .single();
+
+    if (pengajuanError || !pengajuan) {
+      setLoading(false);
+      console.log("PENGAJUAN ERROR:", pengajuanError);
+      alert(
+        JSON.stringify(
+          pengajuanError,
+          null,
+          2
+        )
+      );
+      return;
+    }
+
+    // 2. Insert detail ke tabel domisili
+    const { error: domisiliError } = await supabase.from("domisili").insert({
+      pengajuan_id: pengajuan.id,
+      nama: form.nama,
+      nik: form.nik,
+      jenis_kelamin: form.jenisKelamin,
+      tempat_lahir: form.tempatLahir,
+      tanggal_lahir: form.tanggalLahir,
+      agama: form.agama,
+      alamat: form.alamat,
+      rt: form.rt,
+      rw: form.rw,
+      dusun: form.dusun,
+      keperluan: form.keperluan,
+    });
+
+    setLoading(false);
+
+    if (domisiliError) {
+      console.error("SUPABASE ERROR:", domisiliError);
+      alert(JSON.stringify(domisiliError));
+      return;
+    }
+
+    router.push(
+      `/administrasi/sukses?id=${pengajuan.id}&jenis=domisili`
+    );
+  };
 
   const inputClass =
     "w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400";
@@ -138,16 +154,6 @@ const handleSubmit = async (e: React.FormEvent) => {
     "w-full border border-gray-200 rounded-md px-3 py-2 text-sm text-gray-400 bg-gray-50 focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400 appearance-none";
 
   const labelClass = "block text-xs font-semibold text-green-700 mb-1";
-
-  const isFormValid =
-  form.nama.trim() !== "" &&
-  form.nik.trim() !== "" &&
-  form.jenisKelamin.trim() !== "" &&
-  form.tempatLahir.trim() !== "" &&
-  form.tanggalLahir.trim() !== "" &&
-  form.pekerjaan.trim() !== "" &&
-  form.statusPerkawinan.trim() !== "" &&
-  form.alamat.trim() !== "";
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
@@ -215,7 +221,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             <div>
               <label className={labelClass}>Jenis Kelamin *</label>
-
               <div className="flex items-center gap-5 py-2">
                 <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -228,7 +233,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                   />
                   Laki-laki
                 </label>
-
                 <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
                   <input
                     type="radio"
@@ -258,7 +262,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 required
               />
             </div>
-
             <div>
               <label className={labelClass}>Tanggal Lahir *</label>
               <input
@@ -272,309 +275,113 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* Pekerjaan & Status Perkawinan */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className={labelClass}>Pekerjaan *</label>
-
-              <div className="relative">
-                <select
-                  name="pekerjaan"
-                  value={form.pekerjaan}
-                  onChange={handleChange}
-                  className={selectClass}
-                  required
-                >
-                  <option value="" disabled></option>
-                  <option value="Petani">Petani</option>
-                  <option value="PNS">PNS</option>
-                  <option value="TNI/Polri">TNI/Polri</option>
-                  <option value="Swasta">Swasta</option>
-                  <option value="Wiraswasta">Wiraswasta</option>
-                  <option value="Pelajar/Mahasiswa">Pelajar/Mahasiswa</option>
-                  <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
-
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                  ▼
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label className={labelClass}>Status *</label>
-
-              <div className="relative">
-                <select
-                  name="statusPerkawinan"
-                  value={form.statusPerkawinan}
-                  onChange={handleChange}
-                  className={selectClass}
-                  required
-                >
-                  <option value="" disabled></option>
-                  <option value="Kepala Keluarga">Kepala Keluarga</option>
-                  <option value="Istri">Istri</option>
-                  <option value="Anak">Anak</option>
-                </select>
-
-                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                  ▼
-                </span>
-              </div>
+          {/* Agama */}
+          <div className="mb-4">
+            <label className={labelClass}>Agama *</label>
+            <div className="relative">
+              <select
+                name="agama"
+                value={form.agama}
+                onChange={handleChange}
+                className={selectClass}
+                required
+              >
+                <option value="" disabled>Pilih agama</option>
+                <option value="Islam">Islam</option>
+                <option value="Kristen">Kristen</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Buddha">Buddha</option>
+                <option value="Konghucu">Konghucu</option>
+              </select>
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▼</span>
             </div>
           </div>
 
-          {/* Alamat Lengkap */}
-          <div className="mb-6">
-            <label className={labelClass}>Alamat Lengkap *</label>
+          {/* Section: Alamat */}
+          <div className="bg-amber-50 rounded-lg px-4 py-3 mb-6 mt-2">
+            <h2 className="text-sm font-bold text-green-700">Alamat Domisili</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Masukkan alamat sesuai tempat tinggal saat ini
+            </p>
+          </div>
 
+          {/* Alamat Lengkap */}
+          <div className="mb-4">
+            <label className={labelClass}>Alamat Lengkap *</label>
             <input
               type="text"
               name="alamat"
               value={form.alamat}
-              placeholder="Masukkan alamat lengkap sesuai KTP (RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten)"
+              placeholder="Nama jalan, nomor rumah, dll."
               onChange={handleChange}
               className={inputClass}
               required
             />
           </div>
 
-          {/* Section: Data Anggota Keluarga */}
-          <div className="mt-2 mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="text-sm font-bold text-green-700">
-                Data Anggota Keluarga
-              </h2>
-
-              <button
-                type="button"
-                onClick={addAnggota}
-                className="text-xs border border-amber-400 text-amber-500 hover:bg-amber-50 rounded-md px-3 py-1.5 font-medium transition-colors"
-              >
-                + Tambah Anggota
-              </button>
+          {/* RT, RW, Dusun */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className={labelClass}>RT *</label>
+              <input
+                type="text"
+                name="rt"
+                value={form.rt}
+                placeholder="001"
+                maxLength={3}
+                onChange={handleChange}
+                className={inputClass}
+                required
+              />
             </div>
+            <div>
+              <label className={labelClass}>RW *</label>
+              <input
+                type="text"
+                name="rw"
+                value={form.rw}
+                placeholder="001"
+                maxLength={3}
+                onChange={handleChange}
+                className={inputClass}
+                required
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Dusun *</label>
+              <input
+                type="text"
+                name="dusun"
+                value={form.dusun}
+                placeholder="Nama dusun"
+                onChange={handleChange}
+                className={inputClass}
+                required
+              />
+            </div>
+          </div>
 
-            <p className="text-xs text-gray-400">
-              Tambahkan anggota keluarga yang tinggal satu rumah (opsional)
+          {/* Section: Keperluan */}
+          <div className="bg-amber-50 rounded-lg px-4 py-3 mb-6 mt-2">
+            <h2 className="text-sm font-bold text-green-700">Keperluan</h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Jelaskan tujuan pengajuan surat domisili ini
             </p>
           </div>
 
-          {/* Daftar Anggota */}
-          {form.anggota.map((a, i) => (
-            <div
-              key={i}
-              className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-xs font-semibold text-green-700">
-                  Anggota {i + 1}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => removeAnggota(i)}
-                  className="text-xs text-red-400 hover:text-red-600 transition-colors"
-                >
-                  Hapus
-                </button>
-              </div>
-
-              {/* Nama Lengkap */}
-              <div className="mb-4">
-                <label className={labelClass}>Nama Lengkap *</label>
-
-                <input
-                  type="text"
-                  placeholder="Masukkan nama lengkap sesuai KTP"
-                  value={a.nama}
-                  onChange={(e) =>
-                    handleAnggotaChange(i, "nama", e.target.value)
-                  }
-                  className={inputClass}
-                />
-              </div>
-
-              {/* NIK & Jenis Kelamin */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className={labelClass}>NIK *</label>
-
-                  <input
-                    type="text"
-                    placeholder="16 digit NIK"
-                    maxLength={16}
-                    value={a.nik}
-                    onChange={(e) =>
-                      handleAnggotaChange(i, "nik", e.target.value)
-                    }
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Jenis Kelamin *</label>
-
-                  <div className="flex items-center gap-5 py-2">
-                    <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`jenisKelamin-${i}`}
-                        value="Laki-laki"
-                        checked={a.jenisKelamin === "Laki-laki"}
-                        onChange={(e) =>
-                          handleAnggotaChange(
-                            i,
-                            "jenisKelamin",
-                            e.target.value
-                          )
-                        }
-                        className="accent-green-600"
-                      />
-                      Laki-laki
-                    </label>
-
-                    <label className="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`jenisKelamin-${i}`}
-                        value="Perempuan"
-                        checked={a.jenisKelamin === "Perempuan"}
-                        onChange={(e) =>
-                          handleAnggotaChange(
-                            i,
-                            "jenisKelamin",
-                            e.target.value
-                          )
-                        }
-                        className="accent-green-600"
-                      />
-                      Perempuan
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tempat & Tanggal Lahir */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className={labelClass}>Tempat Lahir *</label>
-
-                  <input
-                    type="text"
-                    placeholder="Kota/Kabupaten tempat lahir"
-                    value={a.tempatLahir}
-                    onChange={(e) =>
-                      handleAnggotaChange(
-                        i,
-                        "tempatLahir",
-                        e.target.value
-                      )
-                    }
-                    className={inputClass}
-                  />
-                </div>
-
-                <div>
-                  <label className={labelClass}>Tanggal Lahir *</label>
-
-                  <input
-                    type="date"
-                    value={a.tanggalLahir}
-                    onChange={(e) =>
-                      handleAnggotaChange(
-                        i,
-                        "tanggalLahir",
-                        e.target.value
-                      )
-                    }
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-
-              {/* Pekerjaan & Status */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className={labelClass}>Pekerjaan *</label>
-
-                  <div className="relative">
-                    <select
-                      value={a.pekerjaan}
-                      onChange={(e) =>
-                        handleAnggotaChange(i, "pekerjaan", e.target.value)
-                      }
-                      className={selectClass}
-                    >
-                      <option value="" disabled></option>
-                      <option value="Petani">Petani</option>
-                      <option value="PNS">PNS</option>
-                      <option value="TNI/Polri">TNI/Polri</option>
-                      <option value="Swasta">Swasta</option>
-                      <option value="Wiraswasta">Wiraswasta</option>
-                      <option value="Pelajar/Mahasiswa">
-                        Pelajar/Mahasiswa
-                      </option>
-                      <option value="Ibu Rumah Tangga">
-                        Ibu Rumah Tangga
-                      </option>
-                      <option value="Lainnya">Lainnya</option>
-                    </select>
-
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                      ▼
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Status *</label>
-
-                  <div className="relative">
-                    <select
-                      value={a.statusPerkawinan}
-                      onChange={(e) =>
-                        handleAnggotaChange(
-                          i,
-                          "statusPerkawinan",
-                          e.target.value
-                        )
-                      }
-                      className={selectClass}
-                    >
-                      <option value="" disabled></option>
-                      <option value="Kepala Keluarga">
-                        Kepala Keluarga
-                      </option>
-                      <option value="Istri">Istri</option>
-                      <option value="Anak">Anak</option>
-                    </select>
-
-                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
-                      ▼
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Alamat */}
-              <div>
-                <label className={labelClass}>Alamat Lengkap *</label>
-
-                <input
-                  type="text"
-                  placeholder="Masukkan alamat lengkap sesuai KTP"
-                  value={a.alamat}
-                  onChange={(e) =>
-                    handleAnggotaChange(i, "alamat", e.target.value)
-                  }
-                  className={inputClass}
-                />
-              </div>
-            </div>
-          ))}
+          <div className="mb-6">
+            <label className={labelClass}>Keperluan Surat *</label>
+            <textarea
+              name="keperluan"
+              value={form.keperluan}
+              placeholder="Contoh: Untuk keperluan melamar pekerjaan, membuka rekening bank, dll."
+              onChange={handleChange}
+              rows={3}
+              className={`${inputClass} resize-none`}
+              required
+            />
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
@@ -594,17 +401,16 @@ const handleSubmit = async (e: React.FormEvent) => {
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
             >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-4 h-4"
-            >
-              <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
-            </svg>
-
-            {loading ? "Mengirim..." : "Kirim Pengajuan"}
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-4 h-4"
+              >
+                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+              </svg>
+              {loading ? "Mengirim..." : "Kirim Pengajuan"}
+            </button>
           </div>
         </form>
       </div>
