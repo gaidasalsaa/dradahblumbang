@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { MapPinIcon , ClockIcon } from "@heroicons/react/24/solid";
 import { supabase } from "@/lib/supabase";
@@ -10,8 +10,7 @@ import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
 import { getSKUData } from "@/lib/pdf/getSKUData";
 import { generateSKUPDF } from "@/lib/pdf/generateSKU";
 
-
-export default function StatusPage() {
+function StatusPageContent() {
   const searchParams = useSearchParams();
   const [nomor, setNomor] = useState("");
   const [error, setError] = useState("");
@@ -317,5 +316,13 @@ export default function StatusPage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function StatusPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <StatusPageContent />
+    </Suspense>
   );
 }

@@ -14,8 +14,9 @@ interface SKTMData {
 }
 
 export async function generateSKTMPDF(data: SKTMData) {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || 'https://dradahblumbang.vercel.app';
   const existingPdfBytes = await fetch(
-    "/template/sktm.pdf"
+    `${baseUrl}/template/sktm.pdf`
   ).then((res) => res.arrayBuffer());
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes);

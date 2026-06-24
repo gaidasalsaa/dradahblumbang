@@ -13,7 +13,8 @@ interface SKUData {
 }
 
 export async function generateSKUPDF(data: SKUData) {
-  const existingPdfBytes = await fetch("/template/sku.pdf").then((res) =>
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || 'https://dradahblumbang.vercel.app';
+  const existingPdfBytes = await fetch(`${baseUrl}/template/sku.pdf`).then((res) =>
     res.arrayBuffer()
   );
 
