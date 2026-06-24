@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import { useAdmin } from '../../lib/adminContext'
 import AdminNotifPanel from './notifpanel'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
 
 function BellIcon() {
   return (
@@ -106,8 +105,8 @@ export default function AdminTopbar() {
             <div className="absolute right-0 top-[calc(100%+8px)] bg-white border border-[#E5E7EB] rounded-xl shadow-xl min-w-[150px] overflow-hidden z-50">
               <button
                 onClick={async () => {
-                  await supabase.auth.signOut()
-                  window.location.href = '/auth/login' // sesuaikan path login kamu
+                  await fetch('/api/auth/logout', { method: 'POST' })
+                  window.location.href = '/auth/login'
                 }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-[#C62828] hover:bg-[#FFEBEE] transition-colors"
               >

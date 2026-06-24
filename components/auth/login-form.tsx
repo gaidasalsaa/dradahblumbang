@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, Check, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Mail, Lock, Eye, EyeOff, Check, AlertCircle, ArrowLeft } from "lucide-react";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -14,7 +15,6 @@ export default function LoginForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,23 +28,24 @@ export default function LoginForm() {
         return;
       }
 
-      // Simulasi delay API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      // Validasi login
-      if (email === "admin@dradahblumbang.com" && password === "admin123") {
-        localStorage.setItem("token", "temp-token");
-        if (rememberMe) {
-          localStorage.setItem("rememberMe", "true");
-        }
-        setIsSuccess(true);
-        setTimeout(() => {
-          router.push("/admin");
-        }, 1500);
-      } else {
-        setError("Email atau password salah");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Email atau password salah");
         setIsLoading(false);
+        return;
       }
+
+      setIsSuccess(true);
+      setTimeout(() => {
+        router.push("/admin");
+      }, 1200);
     } catch (err) {
       setError("Terjadi kesalahan saat login");
       setIsLoading(false);
@@ -53,6 +54,15 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
+      {/* Back to Home */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium mb-5 transition-colors group"
+      >
+        <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
+        Kembali ke Beranda
+      </Link>
+
       {/* Card */}
       <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
         {/* Header - Clean & Minimal */}
@@ -123,24 +133,6 @@ export default function LoginForm() {
                   {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
                 </button>
               </div>
-            </div>
-
-            {/* Remember Me */}
-            <div className="flex items-center gap-2.5">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                disabled={isLoading || isSuccess}
-                className="size-4 rounded border-slate-300 accent-orange-500 cursor-pointer"
-              />
-              <label
-                htmlFor="rememberMe"
-                className="text-sm text-slate-600 cursor-pointer"
-              >
-                Ingat saya di perangkat ini
-              </label>
             </div>
 
             {/* Error State */}

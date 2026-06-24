@@ -34,12 +34,7 @@ export default function AdminToast() {
       {toasts.map(t => (
         <ToastItem key={t.id} toast={t} onRemove={removeToast} />
       ))}
-      <style jsx global>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(14px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+
     </div>
   )
 }

@@ -21,7 +21,7 @@ function NotifItem({ item, onMark }: { item: Notifikasi; onMark: (id: string) =>
           {item.nama}
         </p>
         <p className="text-[11.5px] text-[#6B7280] mt-0.5">
-          {['Surat Keterangan Tidak Mampu', 'Surat Keterangan Domisili', 'Surat Keterangan Usaha', 'Surat PengantarSKCK'][item.jenis]}
+          {['Surat Keterangan Tidak Mampu', 'Surat Keterangan Domisili', 'Surat Keterangan Usaha', 'Surat Pengantar SKCK'][item.jenis]}
         </p>
         <p className="text-[11px] text-[#9CA3AF] mt-0.5">
           {item.waktu}
