@@ -104,7 +104,7 @@ export default function StatusPage() {
                 type="text"
                 value={nomor}
                 onChange={(event) => setNomor(event.target.value)}
-                placeholder="Contoh: p001"
+                placeholder="Contoh: SKTM-20260101-001"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 focus:border-green-400 focus:ring-1 focus:ring-green-400"
               />
             </div>
