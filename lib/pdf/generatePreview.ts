@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase'
 import { generateSKTMPDF } from './generateSKTM'
 import { generateSKUPDF } from './generateSKU'
 import { generateDomisiliPDF } from './generateDomisili'
@@ -17,12 +16,17 @@ function formatTanggalIndonesia(isoString: string) {
   return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`
 }
 
-export async function generateAndUploadPDF(
+/**
+ * Generate PDF preview di sisi client TANPA upload ke Supabase Storage
+ * dan TANPA update file_url. Dipakai admin buat ngecek isi surat
+ * sebelum pengajuan disetujui/ditolak. Isinya sama persis dengan PDF
+ * resmi (generateAndUploadPDF), cuma beda di langkah penyimpanan.
+ */
+export async function generatePreviewPDF(
   pengajuanId: string,
   jenisSurat: string,
-  tanggalPengajuan: string,
-  nomorPengajuan: string
-): Promise<string> {
+  tanggalPengajuan: string
+): Promise<Blob> {
   let pdfBytes: Uint8Array
 
   const tanggal = formatTanggalIndonesia(tanggalPengajuan)
@@ -41,7 +45,6 @@ export async function generateAndUploadPDF(
     })
   } else if (jenisSurat === 'sku') {
     const raw = await getSKUData(pengajuanId)
-    console.log('[SKU raw data]', raw)
     pdfBytes = await generateSKUPDF({
       nama: raw.nama,
       nik: raw.nik,
@@ -84,29 +87,8 @@ export async function generateAndUploadPDF(
       tanggal,
     })
   } else {
-    throw new Error(`Jenis surat '${jenisSurat}' belum didukung`)
+    throw new Error(`Preview untuk jenis surat '${jenisSurat}' belum didukung`)
   }
 
-  // Upload ke Supabase Storage
-  const fileName = `${nomorPengajuan}.pdf`
-  const { error: uploadError } = await supabase.storage
-    .from('surat-pdf')
-    .upload(fileName, pdfBytes, {
-      contentType: 'application/pdf',
-      upsert: true,
-    })
-
-  if (uploadError) throw new Error('Gagal upload PDF: ' + uploadError.message)
-
-  const { data: urlData } = supabase.storage
-    .from('surat-pdf')
-    .getPublicUrl(fileName)
-
-  // Simpan file_url ke pengajuan_surat
-  await supabase
-    .from('pengajuan_surat')
-    .update({ file_url: urlData.publicUrl })
-    .eq('id', pengajuanId)
-
-  return urlData.publicUrl
+  return new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
 }
