@@ -199,13 +199,11 @@ const fetchData = useCallback(async () => {
     dibaca: false,
   }))
     setNotifikasi(prev => {
-      const prevIds = new Set(prev.map(n => n.id))
-      const updated = notifBaru.map(n => ({
+      const prevMap = new Map(prev.map(n => [n.id, n.dibaca]))
+      return notifBaru.map(n => ({
         ...n,
-        dibaca: prev.find(p => p.id === n.id)?.dibaca ?? false,
+        dibaca: prevMap.get(n.id) ?? false,
       }))
-      const hasNew = notifBaru.some(n => !prevIds.has(n.id))
-      return hasNew ? updated : updated
     })
   } else {
     setPengajuan(MOCK_PENGAJUAN)
@@ -224,9 +222,25 @@ useEffect(() => {
       schema: 'public',
       table: 'pengajuan_surat',
     }, () => fetchData())
-    .subscribe()
+    .subscribe((status) => {
+      console.log('[Realtime] status:', status)
+    })
+  const pollInterval = setInterval(() => {
+    fetchData()
+  }, 15000)
+  
+  const handleVisibility = () => {
+    if (document.visibilityState === 'visible') {
+      fetchData()
+    }
+  }
+  document.addEventListener('visibilitychange', handleVisibility)
 
-  return () => { supabase.removeChannel(channel) }
+  return () => {
+    supabase.removeChannel(channel)
+    clearInterval(pollInterval)
+    document.removeEventListener('visibilitychange', handleVisibility)
+  }
 }, [fetchData])
 
   const unreadCount = notifikasi.filter(n => !n.dibaca).length

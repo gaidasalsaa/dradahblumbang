@@ -1,7 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { Pengajuan, StatusType, LayananTab } from '../../lib/adminTypes'
 import { useAdmin } from '../../lib/adminContext'
+import { supabase } from '@/lib/supabase'
+import { generatePreviewPDF } from '../../lib/pdf/generatePreview'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -85,6 +88,36 @@ interface RowProps {
 }
 
 function TableRow({ item, onSetuju, onTolak }: RowProps) {
+  const [isLoadingPdf, setIsLoadingPdf] = useState(false)
+
+  const handleDownload = async (item: Pengajuan) => {
+    // Sudah disetujui → langsung buka PDF resmi (ini juga yang dikirim ke warga)
+    if (item.file_url) {
+      window.open(item.file_url, '_blank')
+      return
+    }
+
+    // Belum disetujui → generate preview on-the-fly, tanpa upload/simpan
+    setIsLoadingPdf(true)
+    try {
+      const { data: raw, error } = await supabase
+        .from('pengajuan_surat')
+        .select('jenis_surat, tanggal_pengajuan')
+        .eq('id', item.id)
+        .single()
+
+      if (error || !raw) throw error ?? new Error('Data tidak ditemukan')
+
+      const blob = await generatePreviewPDF(item.id, raw.jenis_surat, raw.tanggal_pengajuan)
+      const url = URL.createObjectURL(blob)
+      window.open(url, '_blank')
+    } catch (e) {
+      console.error('Gagal generate preview PDF:', e)
+      alert('Gagal membuat preview PDF. Jenis surat ini mungkin belum didukung.')
+    } finally {
+      setIsLoadingPdf(false)
+    }
+  }
   return (
     <tr className="hover:bg-[#FAFDF7] transition-colors border-b border-[#F3F4F6] last:border-b-0">
       {/* ID Pengajuan */}
@@ -103,25 +136,24 @@ function TableRow({ item, onSetuju, onTolak }: RowProps) {
         {item.tgl}
       </td>
 
-      {/* Download PDF */}
+      {/* Download / Preview PDF */}
       <td className="px-5 py-5 text-center align-middle">
         <button
-          onClick={async () => {
-            if (item.file_url) {
-              window.open(item.file_url, '_blank')
-            } else {
-              alert('PDF belum tersedia. Setujui pengajuan dulu untuk generate PDF.')
-            }
-          }}
-          disabled={!item.file_url}
+          onClick={() => handleDownload(item)}
+          disabled={isLoadingPdf}
           className={`flex items-center justify-center gap-2 w-full border rounded-lg px-4 py-2 text-base font-semibold transition-colors whitespace-nowrap
             ${item.file_url
               ? 'border-[#33691E] text-[#33691E] hover:bg-[#F1F8E9] cursor-pointer'
-              : 'border-[#D1D5DB] text-[#9CA3AF] cursor-not-allowed'
-            }`}
+              : 'border-[#558B2F] text-[#558B2F] hover:bg-[#F1F8E9] cursor-pointer'
+            }
+            ${isLoadingPdf ? 'opacity-60 cursor-wait' : ''}`}
         >
           <DownloadIcon />
-          {item.file_url ? 'Download PDF' : 'Belum Ada PDF'}
+          {isLoadingPdf
+            ? 'Membuat PDF...'
+            : item.file_url
+              ? 'Download PDF'
+              : 'Lihat Preview PDF'}
         </button>
       </td>
 

@@ -152,7 +152,7 @@ export async function generateDomisiliPDF(
   // Tanggal tanda tangan
   page.drawText(data.tanggal, {
     x: 418,
-    y: 350,
+    y: 360,
     size: 12,
     font: timesRomanFont,
   });
