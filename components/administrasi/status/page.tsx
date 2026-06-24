@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { MapPinIcon , ClockIcon } from "@heroicons/react/24/solid";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +13,7 @@ import { generateSKUPDF } from "@/lib/pdf/generateSKU";
 
 function StatusPageContent() {
   const searchParams = useSearchParams();
+  const detailSectionRef = useRef<HTMLDivElement>(null);
   const [nomor, setNomor] = useState("");
   const [error, setError] = useState("");
   const [data, setData] = useState<{
@@ -85,6 +86,14 @@ function StatusPageContent() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (data && detailSectionRef.current) {
+      setTimeout(() => {
+        detailSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [data]);
+
     
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
@@ -143,7 +152,7 @@ function StatusPageContent() {
         </div>
 
       {data ? (
-        <div className="mt-10 rounded-3xl border border-green-100 bg-white p-8 shadow-sm">
+        <div ref={detailSectionRef} className="mt-10 rounded-3xl border border-green-100 bg-white p-8 shadow-sm">
           <h2 className="text-sm font-bold text-green-700 mb-4">Informasi Detail Pengajuan</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -279,7 +288,6 @@ function StatusPageContent() {
         break;
       }
 
-      // TEMPLATE SKCK
       case "skck": {
         const detail = await supabase
           .from("skck")
@@ -319,45 +327,44 @@ function StatusPageContent() {
         break;
       }
 
-      // TEMPLATE domisili
-      //case "domisili": {
-      //   const detail = await supabase
-      //     .from("domisili")
-      //     .select("*")
-      //     .eq("pengajuan_id", pengajuan.id)
-      //     .single();
+      case "domisili": {
+        const detail = await supabase
+          .from("domisili")
+          .select("*")
+          .eq("pengajuan_id", pengajuan.id)
+          .single();
 
-      //   const pdfBytes = await generateSKCKPDF({
-      //     nama: detail.data.nama,
-      //     nik: detail.data.nik,
-      //     jenisKelamin: detail.data.jenis_kelamin,
-      //     tempatLahir: detail.data.tempat_lahir,
-      //     tanggalLahir: detail.data.tanggal_lahir,
-      //     agama: detail.data.agama,
-      //     alamat: detail.data.alamat,
-      //     keterangan: detail.data.keterangan,
-      //     keperluan: detail.data.keperluan,
-      //     tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
-      //   });
+        const pdfBytes = await generateSKCKPDF({
+          nama: detail.data.nama,
+          nik: detail.data.nik,
+          jenisKelamin: detail.data.jenis_kelamin,
+          tempatLahir: detail.data.tempat_lahir,
+          tanggalLahir: detail.data.tanggal_lahir,
+          agama: detail.data.agama,
+          pekerjaan: detail.data.pekerjaan ?? "-",
+          alamat: detail.data.alamat,
+          keperluan: detail.data.keperluan,
+          tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
+        });
 
-      //   const blob = new Blob([new Uint8Array(pdfBytes)], {
-      //     type: "application/pdf",
-      //   });
+        const blob = new Blob([new Uint8Array(pdfBytes)], {
+          type: "application/pdf",
+        });
 
-      //   const url = URL.createObjectURL(blob);
-      //   const a = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
 
-      //   a.href = url;
-      //   a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+        a.href = url;
+        a.download = `${pengajuan.nomor_pengajuan}.pdf`;
 
-      //   document.body.appendChild(a);
-      //   a.click();
-      //   a.remove();
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
 
-      //   URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
 
-      //   break;
-      // }
+        break;
+      }
 
                     default:
                       alert("PDF untuk jenis surat ini belum tersedia");
