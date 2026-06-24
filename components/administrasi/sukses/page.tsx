@@ -4,6 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
+// Generate PDF helpers
+import { generateDomisiliPDF } from "@/lib/pdf/generateDomisili";
+import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
+import { generateSKCKPDF } from "@/lib/pdf/generateSKCK";
+import { generateSKUPDF } from "@/lib/pdf/generateSKU";
+
+// Data fetcher helpers
+import { getDomisiliData } from "@/lib/pdf/getDomisiliData";
+import { getSKTMData } from "@/lib/pdf/getSKTMData";
+import { getSKCKData } from "@/lib/pdf/getSKCKData";
+import { getSKUData } from "@/lib/pdf/getSKUData";
+
 import {
   CheckIcon,
   ArrowDownTrayIcon,
@@ -39,8 +51,8 @@ export default function SuksesContent() {
           .eq("id", idPengajuan)
           .single();
 
-        if (error) {
-          console.error("Fetch error:", error);
+        if (error || !data) {
+          alert("Gagal mengambil data pengajuan.");
           return;
         }
 
@@ -91,6 +103,7 @@ export default function SuksesContent() {
         return;
       }
 
+      // Jika sudah ada file_url dari admin, gunakan langsung
       if (fileUrl) {
         const a = document.createElement("a");
         a.href = fileUrl;
@@ -102,70 +115,60 @@ export default function SuksesContent() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("pengajuan_surat")
-        .select("*")
-        .eq("id", idPengajuan)
-        .single();
+      // Generate PDF dari template berdasarkan jenis surat
+      let pdfBytes: Uint8Array | null = null;
 
-      if (error || !data) {
-        alert("Gagal mengambil data pengajuan.");
+      switch (jenisDokumen.toLowerCase()) {
+        case "domisili": {
+          const data = await getDomisiliData(idPengajuan);
+          pdfBytes = await generateDomisiliPDF(data);
+          break;
+        }
+        case "sktm": {
+          const data = await getSKTMData(idPengajuan);
+          pdfBytes = await generateSKTMPDF(data);
+          break;
+        }
+        case "skck": {
+          const data = await getSKCKData(idPengajuan);
+          pdfBytes = await generateSKCKPDF(data);
+          break;
+        }
+        case "sku": {
+          const data = await getSKUData(idPengajuan);
+          pdfBytes = await generateSKUPDF(data);
+          break;
+        }
+        default:
+          alert("Generate PDF untuk surat ini belum tersedia");
+          return;
+      }
+
+      if (!pdfBytes) {
+        alert("Gagal membuat PDF");
         return;
       }
 
-      const printWindow = window.open("", "_blank");
-      if (!printWindow) {
-        alert("Popup diblokir browser. Izinkan popup untuk mengunduh PDF.");
-        return;
-      }
+      // Convert ke Blob → Object URL → auto download
+      const arrayBuffer = pdfBytes.buffer.slice(
+        pdfBytes.byteOffset,
+        pdfBytes.byteOffset + pdfBytes.byteLength
+      );
+      const blob = new Blob([arrayBuffer as ArrayBuffer], {
+        type: "application/pdf",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${nomorPengajuan}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
 
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="utf-8" />
-            <title>Surat Keterangan - ${nomorPengajuan}</title>
-            <style>
-              body { font-family: Arial, sans-serif; padding: 40px; color: #111; }
-              h2 { text-align: center; margin-bottom: 4px; }
-              p.center { text-align: center; margin-bottom: 24px; }
-              table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-              td { padding: 6px 8px; font-size: 14px; vertical-align: top; }
-              td:first-child { width: 200px; font-weight: bold; }
-              .divider { border-top: 1px solid #ccc; margin: 24px 0; }
-              .footer { margin-top: 48px; text-align: right; }
-            </style>
-          </head>
-          <body>
-            <h2>TANDA TERIMA PENGAJUAN SURAT</h2>
-            <p class="center">Desa Dradah Blumbang</p>
-            <div class="divider"></div>
-            <table>
-              <tr><td>Nomor Pengajuan</td><td>: ${data.nomor_pengajuan}</td></tr>
-              <tr><td>Nama Warga</td><td>: ${data.nama_warga}</td></tr>
-              <tr><td>NIK</td><td>: ${data.nik}</td></tr>
-              <tr><td>Jenis Surat</td><td>: ${data.jenis_surat}</td></tr>
-              <tr><td>Status</td><td>: ${data.status}</td></tr>
-              <tr><td>Tanggal Pengajuan</td><td>: ${new Date(data.tanggal_pengajuan).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</td></tr>
-            </table>
-            <div class="divider"></div>
-            <p style="font-size:13px; color:#555;">
-              Simpan dokumen ini sebagai bukti pengajuan. Surat resmi akan diterbitkan setelah diverifikasi oleh admin desa.
-            </p>
-            <div class="footer">
-              <p style="font-size:13px;">Dradah Blumbang, ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}</p>
-              <p style="font-size:13px;">Petugas Administrasi Desa</p>
-              <br/><br/>
-              <p style="font-size:13px;">(__________________________)</p>
-            </div>
-            <script>window.onload = () => { window.print(); }</script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
     } catch (error) {
       console.error(error);
-      alert("Gagal mengunduh dokumen.");
+      alert("Gagal membuat PDF");
     } finally {
       setIsDownloading(false);
     }
@@ -252,7 +255,7 @@ export default function SuksesContent() {
           }`}
         >
           <ArrowDownTrayIcon className="w-4 h-4" />
-          {isDownloading ? "Memproses..." : "Download Tanda Terima"}
+          {isDownloading ? "Memproses..." : "Download PDF Surat"}
         </button>
 
         <button

@@ -14,6 +14,7 @@ export default function FormSKCK() {
     tempatLahir: "",
     tanggalLahir: "",
     agama: "",
+    pekerjaan: "",
     alamat: "",
     keperluan: "",
   });
@@ -32,6 +33,7 @@ export default function FormSKCK() {
       tempatLahir: "",
       tanggalLahir: "",
       agama: "",
+      pekerjaan: "",
       alamat: "",
       keperluan: "",
     });
@@ -48,25 +50,68 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   setLoading(true);
-  const { error } = await supabase.from("pengajuan_surat").insert({
-    nama_warga: form.nama,
-    nik: form.nik,
-    jenis_surat: "skck",
-    status: "Menunggu",
-    // simpan detail tambahan sebagai catatan (opsional)
-    catatan_revisi: null,
-    file_url: null,
+
+  const today = new Date();
+  const tanggal =
+    today.getFullYear().toString() +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    String(today.getDate()).padStart(2, "0");
+
+  const nomorPengajuan = `SKCK-${tanggal}-${Date.now().toString().slice(-4)}`;
+
+  // 1. Insert ke tabel pengajuan_surat dengan field yang diperlukan
+  const { data: pengajuan, error: errorPengajuan } = await supabase
+    .from("pengajuan_surat")
+    .insert({
+      nama_warga: form.nama,
+      nik: form.nik,
+      jenis_surat: "skck",
+      nomor_pengajuan: nomorPengajuan,
+      tanggal_pengajuan: new Date().toISOString(),
+      status: "Menunggu",
+      catatan_revisi: null,
+      file_url: null,
+    })
+    .select("id")
+    .single();
+
+  if (errorPengajuan || !pengajuan) {
+    setLoading(false);
+    alert("Gagal mengirim pengajuan. Coba lagi.");
+    console.error("PENGAJUAN ERROR:", errorPengajuan);
+    return;
+  }
+
+  // 2. Insert detail ke tabel skck
+  const { error: errorDetail } = await supabase.from("skck").insert({
+    pengajuan_id:        pengajuan.id,
+    nama:                form.nama,
+    nik:                 form.nik,
+    jenis_kelamin:       form.jenisKelamin,
+    tempat_lahir:        form.tempatLahir,
+    tanggal_lahir:       form.tanggalLahir,
+    agama:               form.agama,
+    pekerjaan:           form.pekerjaan,
+    alamat:              form.alamat,
+    keperluan:           form.keperluan,
+    // tanggal:             new Date().toISOString().split('T')[0],
   });
 
   setLoading(false);
 
-  if (error) {
-    alert("Gagal mengirim pengajuan. Coba lagi.");
-    console.error(error);
+  if (errorDetail) {
+    console.error("DETAIL ERROR FULL:", {
+      code: (errorDetail as any)?.code,
+      message: (errorDetail as any)?.message,
+      details: (errorDetail as any)?.details,
+      hint: (errorDetail as any)?.hint,
+      errorDetail,
+    });
+    alert(`Gagal menyimpan detail pengajuan: ${(errorDetail as any)?.message || 'Coba lagi.'}`);
     return;
   }
 
-  router.push("/administrasi/sukses");
+  router.push(`/administrasi/sukses?id=${pengajuan.id}`);
 };
 
   const inputClass =
@@ -84,6 +129,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   form.tempatLahir.trim() !== "" &&
   form.tanggalLahir.trim() !== "" &&
   form.agama.trim() !== "" &&
+  form.pekerjaan.trim() !== "" &&
   form.keperluan.trim() !== "" &&
   form.alamat.trim() !== "";
 
@@ -225,6 +271,20 @@ const handleSubmit = async (e: React.FormEvent) => {
               </select>
               <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▼</span>
             </div>
+          </div>
+          
+          {/* Pekerjaan */}
+          <div className="mb-4">
+            <label className={labelClass}>Pekerjaan *</label>
+            <input
+              type="text"
+              name="pekerjaan"
+              value={form.pekerjaan}
+              placeholder="Masukkan pekerjaan sesuai KTP"
+              onChange={handleChange}
+              className={inputClass}
+              required
+            />
           </div>
 
           {/* Alamat Lengkap */}

@@ -10,11 +10,12 @@ export default function TestPDFPage() {
     const pdfBytes = await generateSKTMPDF({
       nama: data.nama,
       nik: data.nik,
-      jenisKelamin: data.jenis_kelamin,
-      tempatTanggalLahir: `${data.tempat_lahir}, ${new Date(data.tanggal_lahir).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}`,
+      jenisKelamin: data.jenisKelamin,
+      tempatLahir: data.tempatLahir,
+      tanggalLahir: data.tanggalLahir,
       alamat: data.alamat,
       keperluan: data.keperluan,
-      tanggal: new Date().toLocaleDateString("id-ID", {  // ← ini yang kurang
+      tanggal: new Date().toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",

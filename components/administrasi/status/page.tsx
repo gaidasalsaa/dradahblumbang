@@ -6,6 +6,7 @@ import { MapPinIcon , ClockIcon } from "@heroicons/react/24/solid";
 import { supabase } from "@/lib/supabase";
 import { getSKTMData } from "@/lib/pdf/getSKTMData";
 import { generateSKTMPDF } from "@/lib/pdf/generateSKTM";
+import { generateSKCKPDF } from "@/lib/pdf/generateSKCK";
 
 import { getSKUData } from "@/lib/pdf/getSKUData";
 import { generateSKUPDF } from "@/lib/pdf/generateSKU";
@@ -214,18 +215,14 @@ function StatusPageContent() {
                         .eq("pengajuan_id", pengajuan.id)
                         .single();
 
-                      if (detailError || !detail) {
-                        alert("Detail SKTM tidak ditemukan");
-                        return;
-                      }
-
                       const pdfBytes = await generateSKTMPDF({
-                        nama: detail.nama,
-                        nik: detail.nik,
-                        jenisKelamin: detail.jenis_kelamin,
-                        tempatTanggalLahir: detail.tempatTanggalLahir,
-                        alamat: detail.alamat,
-                        keperluan: detail.keperluan,
+                        nama: detail.data.nama,
+                        nik: detail.data.nik,
+                        jenisKelamin: detail.data.jenis_kelamin,
+                        tempatLahir: detail.data.tempat_lahir,
+                        tanggalLahir: detail.data.tanggal_lahir,
+                        alamat: detail.data.alamat,
+                        keperluan: detail.data.keperluan,
                         tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
                       });
 
@@ -251,19 +248,15 @@ function StatusPageContent() {
                         .eq("pengajuan_id", pengajuan.id)
                         .single();
 
-                      if (detailError || !detail) {
-                        alert("Detail SKU tidak ditemukan");
-                        return;
-                      }
-
                       const pdfBytes = await generateSKUPDF({
-                        nama: detail.nama,
-                        nik: detail.nik,
-                        jenisKelamin: detail.jenis_kelamin,
-                        tempatTanggalLahir: detail.tempatTanggalLahir,
-                        agama: detail.agama,
-                        alamat: detail.alamat,
-                        bidang_usaha: detail.bidang_usaha,
+                        nama: detail.data.nama,
+                        nik: detail.data.nik,
+                        jenisKelamin: detail.data.jenis_kelamin,
+                        tempatLahir: detail.data.tempat_lahir,
+                        tanggalLahir: detail.data.tanggal_lahir,
+                        agama: detail.data.agama,
+                        alamat: detail.data.alamat,
+                        bidang_usaha: detail.data.bidang_usaha,
                         tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
                       });
 
@@ -271,16 +264,100 @@ function StatusPageContent() {
                         type: "application/pdf",
                       });
 
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement("a");
-                      a.href = url;
-                      a.download = `${pengajuan.nomor_pengajuan}.pdf`;
-                      document.body.appendChild(a);
-                      a.click();
-                      a.remove();
-                      URL.revokeObjectURL(url);
-                      break;
-                    }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+
+        break;
+      }
+
+      // TEMPLATE SKCK
+      case "skck": {
+        const detail = await supabase
+          .from("skck")
+          .select("*")
+          .eq("pengajuan_id", pengajuan.id)
+          .single();
+
+        const pdfBytes = await generateSKCKPDF({
+          nama: detail.data.nama,
+          nik: detail.data.nik,
+          jenisKelamin: detail.data.jenis_kelamin,
+          tempatLahir: detail.data.tempat_lahir,
+          tanggalLahir: detail.data.tanggal_lahir,
+          agama: detail.data.agama,
+          pekerjaan: detail.data.pekerjaan,
+          alamat: detail.data.alamat,
+          keperluan: detail.data.keperluan,
+          tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
+        });
+
+        const blob = new Blob([new Uint8Array(pdfBytes)], {
+          type: "application/pdf",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+
+        a.href = url;
+        a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+
+        break;
+      }
+
+      // TEMPLATE domisili
+      //case "domisili": {
+      //   const detail = await supabase
+      //     .from("domisili")
+      //     .select("*")
+      //     .eq("pengajuan_id", pengajuan.id)
+      //     .single();
+
+      //   const pdfBytes = await generateSKCKPDF({
+      //     nama: detail.data.nama,
+      //     nik: detail.data.nik,
+      //     jenisKelamin: detail.data.jenis_kelamin,
+      //     tempatLahir: detail.data.tempat_lahir,
+      //     tanggalLahir: detail.data.tanggal_lahir,
+      //     agama: detail.data.agama,
+      //     alamat: detail.data.alamat,
+      //     keterangan: detail.data.keterangan,
+      //     keperluan: detail.data.keperluan,
+      //     tanggal: new Date(pengajuan.tanggal_pengajuan).toLocaleDateString("id-ID"),
+      //   });
+
+      //   const blob = new Blob([new Uint8Array(pdfBytes)], {
+      //     type: "application/pdf",
+      //   });
+
+      //   const url = URL.createObjectURL(blob);
+      //   const a = document.createElement("a");
+
+      //   a.href = url;
+      //   a.download = `${pengajuan.nomor_pengajuan}.pdf`;
+
+      //   document.body.appendChild(a);
+      //   a.click();
+      //   a.remove();
+
+      //   URL.revokeObjectURL(url);
+
+      //   break;
+      // }
 
                     default:
                       alert("PDF untuk jenis surat ini belum tersedia");

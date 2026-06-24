@@ -1,9 +1,9 @@
-// lib/data/getSKTMData.ts
+// lib/data/getSKCKData.ts
 import { supabase } from "@/lib/supabase";
 
-export async function getSKTMData(pengajuanId: string) {
+export async function getSKCKData(pengajuanId: string) {
   const { data, error } = await supabase
-    .from("sktm")
+    .from("skck")
     .select("*")
     .eq("pengajuan_id", pengajuanId)
     .single();
@@ -14,9 +14,10 @@ export async function getSKTMData(pengajuanId: string) {
     nama:                data.nama                 ?? "",
     nik:                 data.nik                  ?? "",
     jenisKelamin:        data.jenis_kelamin         ?? "",
-    // tempatTanggalLahir:  data.tempat_tanggal_lahir  ?? "",
     tempatLahir:         data.tempat_lahir          ?? "",
     tanggalLahir:        data.tanggal_lahir         ?? "",
+    agama:               data.agama                 ?? "",
+    pekerjaan:           data.pekerjaan             ?? "",
     alamat:              data.alamat                ?? "",
     keperluan:           data.keperluan             ?? "",
     tanggal:             data.tanggal               ?? "",

@@ -5,7 +5,8 @@ interface SKUData {
   nama: string;
   nik: string;
   jenisKelamin: string;
-  tempatTanggalLahir: string;
+  tempatLahir: string;
+  tanggalLahir: string;
   agama: string;
   alamat: string;
   bidang_usaha: string; 
@@ -23,15 +24,28 @@ export async function generateSKUPDF(data: SKUData) {
   const page = pdfDoc.getPages()[0];
   const alamatLines = splitTextIntoLines(data.alamat, 45);
 
-  page.drawText(data.nama,              { x: 223, y: 700, size: 12, font });
-  page.drawText(data.nik,               { x: 223, y: 666, size: 12, font });
-  page.drawText(data.jenisKelamin,      { x: 223, y: 634, size: 12, font });
-  page.drawText(data.tempatTanggalLahir,{ x: 223, y: 601, size: 12, font });
-  page.drawText(data.agama,             { x: 223, y: 568, size: 12, font });
+  page.drawText(data.nama,              { x: 213, y: 698, size: 12, font });
+  page.drawText(data.nik,               { x: 213, y: 666, size: 12, font });
+  page.drawText(data.jenisKelamin,      { x: 213, y: 633, size: 12, font });
+  const tempatTanggalLahir = `${data.tempatLahir}, ${new Date(
+      data.tanggalLahir
+    ).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })}`;
+
+    page.drawText(tempatTanggalLahir, {
+      x: 213,
+      y: 600,
+      size: 12,
+      font,
+    });
+  page.drawText(data.agama,             { x: 213, y: 568, size: 12, font });
   alamatLines.forEach((line, i) => {
-    page.drawText(line, { x: 223, y: 535 - i * 18, size: 12, font });
+    page.drawText(line, { x: 213, y: 535 - i * 18, size: 12, font });
   });
-  page.drawText(data.bidang_usaha,        { x: 223, y: 395, size: 12, font });
+  page.drawText(data.bidang_usaha,        { x: 213, y: 395, size: 12, font });
   page.drawText(data.tanggal, { x: 429, y: 301, size: 12, font });
 
   return await pdfDoc.save();

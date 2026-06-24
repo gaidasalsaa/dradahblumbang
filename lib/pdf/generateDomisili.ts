@@ -3,7 +3,8 @@ import { splitTextIntoLines } from "./utils";
 
 interface DomisiliData {
   nama: string;
-  tempatTanggalLahir: string;
+  tempatLahir: string;
+  tanggalLahir: string;
   nik: string;
   jenisKelamin: string;
   agama: string;
@@ -18,13 +19,37 @@ interface DomisiliData {
 export async function generateDomisiliPDF(
   data: DomisiliData
 ) {
-  const existingPdfBytes = await fetch(
-    "/template/domisili.pdf"
-  ).then((res) => res.arrayBuffer());
+  const templateUrl =
+    typeof window !== "undefined"
+      ? new URL("/template/domisili.pdf", window.location.origin).toString()
+      : "/template/domisili.pdf";
 
-  const pdfDoc = await PDFDocument.load(
-    existingPdfBytes
-  );
+  const res = await fetch(templateUrl);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `Failed to fetch template PDF: ${res.status} ${res.statusText} - ${text.slice(0, 200)}`
+    );
+  }
+
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("pdf")) {
+    const snippet = await res.text().catch(() => "");
+    throw new Error(
+      `Template is not a PDF (content-type: ${contentType}). Response snippet: ${snippet.slice(0,200)}`
+    );
+  }
+
+  const existingPdfBytes = await res.arrayBuffer();
+
+  let pdfDoc;
+  try {
+    pdfDoc = await PDFDocument.load(existingPdfBytes);
+  } catch (err) {
+    throw new Error(
+      `Failed to parse template PDF: ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
 
   const timesRomanFont =
     await pdfDoc.embedFont(
@@ -41,40 +66,48 @@ export async function generateDomisiliPDF(
 
   // Nama
   page.drawText(data.nama, {
-    x: 223,
-    y: 720,
+    x: 240,
+    y: 706,
     size: 12,
     font: timesRomanFont,
   });
 
   // Tempat Tanggal Lahir
-  page.drawText(data.tempatTanggalLahir, {
-    x: 223,
-    y: 693,
+  const tempatTanggalLahir = `${data.tempatLahir}, ${new Date(
+    data.tanggalLahir
+  ).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}`;
+
+  page.drawText(tempatTanggalLahir, {
+    x: 240,
+    y: 678,
     size: 12,
     font: timesRomanFont,
   });
 
   // NIK
   page.drawText(data.nik, {
-    x: 223,
-    y: 665,
+    x: 240,
+    y: 650,
     size: 12,
     font: timesRomanFont,
   });
 
   // Jenis Kelamin
   page.drawText(data.jenisKelamin, {
-    x: 223,
-    y: 637,
+    x: 240,
+    y: 622,
     size: 12,
     font: timesRomanFont,
   });
 
   // Agama
   page.drawText(data.agama, {
-    x: 223,
-    y: 609,
+    x: 240,
+    y: 595,
     size: 12,
     font: timesRomanFont,
   });
@@ -82,8 +115,8 @@ export async function generateDomisiliPDF(
   // Alamat
   alamatLines.forEach((line, index) => {
     page.drawText(line, {
-      x: 223,
-      y: 581 - index * 18,
+      x: 240,
+      y: 568 - index * 18,
       size: 12,
       font: timesRomanFont,
     });
@@ -96,13 +129,13 @@ export async function generateDomisiliPDF(
   const keteranganLines =
     splitTextIntoLines(
       keterangan,
-      55
+      60
     );
 
   keteranganLines.forEach((line, index) => {
     page.drawText(line, {
-      x: 223,
-      y: 520 - index * 18,
+      x: 240,
+      y: 526 - index * 18,
       size: 12,
       font: timesRomanFont,
     });
@@ -110,8 +143,8 @@ export async function generateDomisiliPDF(
 
   // Keperluan
   page.drawText(data.keperluan, {
-    x: 223,
-    y: 455,
+    x: 240,
+    y: 472,
     size: 12,
     font: timesRomanFont,
   });

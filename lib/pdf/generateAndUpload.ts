@@ -28,8 +28,9 @@ export async function generateAndUploadPDF(
     pdfBytes = await generateSKTMPDF({
       nama: raw.nama,
       nik: raw.nik,
-      jenisKelamin: raw.jenis_kelamin,
-      tempatTanggalLahir: `${raw.tempat_lahir}, ${formatTanggalIndonesia(raw.tanggal_lahir)}`,
+      jenisKelamin: raw.jenisKelamin,
+      tempatLahir: raw.tempatLahir,
+      tanggalLahir: raw.tanggalLahir,
       alamat: raw.alamat,
       keperluan: raw.keperluan,
       tanggal,
@@ -40,8 +41,9 @@ export async function generateAndUploadPDF(
     pdfBytes = await generateSKUPDF({
       nama: raw.nama,
       nik: raw.nik,
-      jenisKelamin: raw.jenis_kelamin,
-      tempatTanggalLahir: `${raw.tempat_lahir}, ${formatTanggalIndonesia(raw.tanggal_lahir)}`,
+      jenisKelamin: raw.jenisKelamin,
+      tempatLahir: raw.tempatLahir,
+      tanggalLahir: raw.tanggalLahir,
       agama: raw.agama,
       alamat: raw.alamat,
       bidang_usaha: raw.bidang_usaha,

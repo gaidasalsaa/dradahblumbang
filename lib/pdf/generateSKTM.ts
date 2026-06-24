@@ -7,10 +7,11 @@ interface SKTMData {
   nama: string;
   nik: string;
   jenisKelamin: string;
-  tempatTanggalLahir: string;
+  tempatLahir: string;
+  tanggalLahir: string;
   alamat: string;
   keperluan: string;
-  tanggal: string
+  tanggal: string;
 }
 
 export async function generateSKTMPDF(data: SKTMData) {
@@ -54,7 +55,15 @@ export async function generateSKTMPDF(data: SKTMData) {
     font: timesRomanFont,
   });
 
-  page.drawText(data.tempatTanggalLahir, {
+  const tempatTanggalLahir = `${data.tempatLahir}, ${new Date(
+    data.tanggalLahir
+  ).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })}`;
+
+  page.drawText(tempatTanggalLahir, {
     x: 223,
     y: 637,
     size: 12,
