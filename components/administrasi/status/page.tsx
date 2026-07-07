@@ -169,9 +169,24 @@ function StatusPageContent() {
               <p className="text-sm text-gray-700">{data.tanggalPengajuan}</p>
             </div>
             <div className="rounded-2xl bg-[#F7FAF2] p-5 border border-green-100">
-              <p className="text-xs font-semibold text-green-700 mb-1">Status</p>
-              <p className="text-sm text-gray-700">{data.status}</p>
-            </div>
+  <p className="text-xs font-semibold text-green-700 mb-2">Status</p>
+
+  <span
+    className={`inline-block px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide
+      ${
+        data.status === "Disetujui"
+          ? "bg-green-100 text-green-800"
+          : data.status === "Ditolak"
+          ? "bg-red-100 text-red-800"
+          : data.status === "Menunggu Persetujuan"
+          ? "bg-yellow-100 text-yellow-800"
+          : "bg-gray-100 text-gray-700"
+      }
+    `}
+  >
+    {data.status}
+  </span>
+</div>
           </div>
 
           <div className="mt-6 rounded-2xl bg-[#FEF7E1] p-5 border border-amber-200">
